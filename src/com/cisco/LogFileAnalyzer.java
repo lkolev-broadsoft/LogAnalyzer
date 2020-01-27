@@ -97,7 +97,7 @@ public abstract class LogFileAnalyzer {
         }
     }
 
-    protected abstract void getFileNames(List <String> listOfEntries);
+    protected abstract List<String> getFileNames(List <String> listOfEntries);
 
     protected Map<String, Long> analyzeLog(InputStream inputStream){
         seconds = getTimeFrameList(inputStream);
