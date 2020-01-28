@@ -10,18 +10,20 @@ import java.util.stream.Collectors;
 
 public abstract class LogFileAnalyzer {
 
-    protected TreeMap<String, Long> logsPerSecond = new TreeMap<>();
+    protected SortedMap<String, Long> logsPerSecond = new TreeMap<>();
 
     protected List<String> secondsMissingInLog = new ArrayList<>();
 
     protected List<String> seconds = new ArrayList<>();
 
+    protected String logType;
+
     public List<String> getTimeFrameList(InputStream inputStream) {
 
-        String pattern = "(19|20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])\\s(0[1-9]|1[0-9]|2[0-3])\\:([0-5][0-9])\\:([0-5][0-9])\\:([0-9]{3})\\s(\\w+)\\s\\|\\s(\\bFieldDebug\\b|\\bInfo\\b|\\bDebug\\b|\\bNotice\\b|\\bWarn\\b)\\s+\\|\\s(\\w+)";
+        String pattern = "(20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])\\s(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]):([0-9]{3})\\s(\\w+)\\s\\|\\s(\\bFieldDebug\\b|\\bInfo\\b|\\bDebug\\b|\\bNotice\\b|\\bWarn\\b)\\s+\\|\\s(\\w+)";
         List<String> timeFrame = new ArrayList<>();
         Pattern r = Pattern.compile(pattern);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 Matcher m = r.matcher(line);
@@ -37,7 +39,7 @@ public abstract class LogFileAnalyzer {
         }
     }
 
-    public TreeMap<String, Long> countSeconds(List<String> timeFrame){
+    public SortedMap<String, Long> countSeconds(List<String> timeFrame){
         Map<String, Long> inputMap = timeFrame.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
         return new TreeMap<>(inputMap); //Added the resulting map to treemap
     }
@@ -45,7 +47,7 @@ public abstract class LogFileAnalyzer {
     public List<String> getTimeFrame(SortedMap<String, Long> sortedMap){
         String startTime = sortedMap.firstKey();   // Get String with the starting time
         String endTime = sortedMap.lastKey();        // Get String with the ending time
-        String pattern = "(20\\d\\d)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\\s(0[1-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])";
+        String pattern = "(20\\d\\d)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\\s(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])";
         Pattern r = Pattern.compile(pattern);
         Matcher startMatcher = r.matcher(startTime);
         startMatcher.matches();
