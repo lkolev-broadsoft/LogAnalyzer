@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -24,23 +26,6 @@ public class LogAnalyzer {
     public LogAnalyzer(String inputZipFile){
         inputZipFilePath = inputZipFile;
     }
-
-//    private void listEntriesInZip(){
-//        try {
-//            ZipFile zipFile = new ZipFile(inputZipFilePath);
-//            entries = zipFile.entries();
-//            while (entries.hasMoreElements()) {
-//                ZipEntry entry = entries.nextElement();
-//                if (!entry.isDirectory()) {
-//                    listOfFiles.add(entry.getName());
-//                }
-//            }
-//            zipFile.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
 
     // Add listing of All entries in zip to CallIMPLogAnalyser method as ZipFIle = null. In the future rename it to callLogAnalyser or analyserLogs
 

@@ -10,6 +10,16 @@ import java.util.stream.Collectors;
 
 public abstract class LogFileAnalyzer {
 
+    protected static final String DATE_REGEX = "(20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])";
+
+    protected static final String TIME_REGEX = "(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]):([0-9]{3})";
+
+    protected static final String TIME_ZONE_REGEX = "(\\w+)";
+
+    protected static final String LOG_LEVEL_REGEX = "(\\bFieldDebug\\b|\\bInfo\\b|\\bDebug\\b|\\bNotice\\b|\\bWarn\\b)";
+
+    protected static final String LOG_TYPE_REGEX = "(\\w+)"; //Change it later to match only the log types
+
     protected SortedMap<String, Long> logsPerSecond = new TreeMap<>();
 
     protected List<String> secondsMissingInLog = new ArrayList<>();
@@ -20,7 +30,8 @@ public abstract class LogFileAnalyzer {
 
     public List<String> getTimeFrameList(InputStream inputStream) {
 
-        String pattern = "(20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])\\s(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]):([0-9]{3})\\s(\\w+)\\s\\|\\s(\\bFieldDebug\\b|\\bInfo\\b|\\bDebug\\b|\\bNotice\\b|\\bWarn\\b)\\s+\\|\\s(\\w+)";
+//        String pattern = "(20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])\\s(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]):([0-9]{3})\\s(\\w+)\\s\\|\\s(\\bFieldDebug\\b|\\bInfo\\b|\\bDebug\\b|\\bNotice\\b|\\bWarn\\b)\\s+\\|\\s(\\w+)";
+        String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
         List<String> timeFrame = new ArrayList<>();
         Pattern r = Pattern.compile(pattern);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {

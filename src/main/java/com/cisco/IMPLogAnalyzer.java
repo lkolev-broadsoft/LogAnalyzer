@@ -15,7 +15,7 @@ public class IMPLogAnalyzer extends LogFileAnalyzer {
 
     @Override
     protected List<String> getFileNames(List <String> listOfEntries) {
-        String pattern = "(IMPLog)(\\d{4}\\.\\d{2}\\.\\d{2})-(\\d{2}\\.\\d{2}\\.\\d{2})(.txt)";
+        String pattern = logType + "(\\d{4}\\.\\d{2}\\.\\d{2})-(\\d{2}\\.\\d{2}\\.\\d{2})(.txt)";
         Pattern r = Pattern.compile(pattern);
         for(String entry : listOfEntries){
             Matcher m = r.matcher(entry);
