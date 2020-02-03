@@ -110,7 +110,19 @@ public abstract class LogFileAnalyzer {
         }
     }
 
-    protected abstract List<String> getFileNames(List <String> listOfEntries);
+//    protected abstract List<String> getFileNames(List <String> listOfEntries);
+    protected List<String> getFileNames(List<String> listOfEntries) {
+        List<String> filenames = new ArrayList<>();
+        String pattern = logType + "(\\d{4}\\.\\d{2}\\.\\d{2})-(\\d{2}\\.\\d{2}\\.\\d{2})(.txt)";
+        Pattern r = Pattern.compile(pattern);
+        for(String entry : listOfEntries){
+            Matcher m = r.matcher(entry);
+            if(m.find()){
+                filenames.add(m.group());
+            }
+        }
+        return filenames;
+    }
 
     protected Map<String, Long> analyzeLog(InputStream inputStream){
         seconds = getTimeFrameList(inputStream);
