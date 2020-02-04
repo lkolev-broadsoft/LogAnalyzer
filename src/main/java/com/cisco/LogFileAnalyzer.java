@@ -55,7 +55,7 @@ public abstract class LogFileAnalyzer {
         return new TreeMap<>(inputMap); //Added the resulting map to treemap
     }
 
-    public List<String> getTimeFrame(SortedMap<String, Long> sortedMap){
+    protected List<String> getTimeFrame(SortedMap<String, Long> sortedMap){
         String startTime = sortedMap.firstKey();   // Get String with the starting time
         String endTime = sortedMap.lastKey();        // Get String with the ending time
         String pattern = "(20\\d\\d)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\\s(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])";
@@ -99,7 +99,7 @@ public abstract class LogFileAnalyzer {
         return sortedMap;
     }
 
-    protected void writeToOuputTxtFile(Map<String, Long> inputMap, String filename){
+    protected void writeToOutputTxtFile(Map<String, Long> inputMap, String filename){
         try (FileWriter writer = new FileWriter(filename);
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Long> entry : inputMap.entrySet()) {
@@ -110,7 +110,6 @@ public abstract class LogFileAnalyzer {
         }
     }
 
-//    protected abstract List<String> getFileNames(List <String> listOfEntries);
     protected List<String> getFileNames(List<String> listOfEntries) {
         List<String> filenames = new ArrayList<>();
         String pattern = logType + "(\\d{4}\\.\\d{2}\\.\\d{2})-(\\d{2}\\.\\d{2}\\.\\d{2})(.txt)";

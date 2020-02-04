@@ -17,13 +17,13 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 public class LogAnalyzer {
 
-    private static final int BUFFER = 2048;
-
     protected InputStream inputStream;
 
     protected String inputArchiveFilePath;
 
     protected IMPLogAnalyzer impLogAnalyzer = new IMPLogAnalyzer();
+
+    protected StatsLogAnalyzer statsLogAnalyzer = new StatsLogAnalyzer();
 
     protected List<String> listOfFiles = new ArrayList<>();
 
@@ -34,16 +34,20 @@ public class LogAnalyzer {
         determineArchiveType(inputArchiveFilePath);
     }
 
+    //Take actions according to the type of logs provided.
+    //Go through all of the logs
+
     protected void determineArchiveType(String inputArchiveFile){
         String pattern = "(\\.zip)|(\\.tar\\.gz)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(inputArchiveFile);
         if(m.find()){
             if(m.group().equals(m.group(1))){
-                callIMPLogAnalyzer();
+                //openZIPFile();
+                openZIPFileReadStats();
             }
             else if(m.group().equals(m.group(2))){
-               openTarGZFile();
+               //openTarGZFile();
             }
             else {
                 System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");
@@ -51,9 +55,10 @@ public class LogAnalyzer {
             }
     }
 
+    //Use factory pattern to create the type of logAnalyser when the String type of log is encountered. Better then if else and switch maybe.
 
     // Add listing of All entries in zip to CallIMPLogAnalyser method as ZipFIle = null. In the future rename it to callLogAnalyser or analyserLogs
-    protected void callIMPLogAnalyzer(){
+    protected void openZIPFile(){
         try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
             int filecount = 0;
             entries = zipFile.entries();
@@ -63,7 +68,33 @@ public class LogAnalyzer {
                     ZipEntry imp = zipFile.getEntry(entry.getName());
                     listOfFiles.add(entry.getName());
                     inputStream = zipFile.getInputStream(imp);
-                    impLogAnalyzer.writeToOuputTxtFile(impLogAnalyzer.analyzeLog(inputStream), ("result" + (impLogAnalyzer.getFileNames(listOfFiles).get(filecount))));
+                    impLogAnalyzer.writeToOutputTxtFile(impLogAnalyzer.analyzeLog(inputStream), ("result" + (impLogAnalyzer.getFileNames(listOfFiles).get(filecount))));
+                    filecount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    protected void openZIPFileReadStats(){
+        try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
+            int filecount = 0;
+            entries = zipFile.entries();
+            while(entries.hasMoreElements()){
+                ZipEntry entry = entries.nextElement();
+                if(!entry.isDirectory() && entry.getName().contains(statsLogAnalyzer.logType)){
+                    ZipEntry stats = zipFile.getEntry(entry.getName());
+                    listOfFiles.add(entry.getName());
+                    inputStream = zipFile.getInputStream(stats);
+                    statsLogAnalyzer.writeToOutputTxtFile(statsLogAnalyzer.getLastPackets(inputStream), ("result_" + (listOfFiles.get(filecount))));
                     filecount++;
                 }
             }
@@ -86,7 +117,7 @@ public class LogAnalyzer {
             while (currentEntry != null){
                 if(!currentEntry.isDirectory() && currentEntry.getName().contains("IMPLog")){
                     listOfFiles.add(currentEntry.getName());
-                    impLogAnalyzer.writeToOuputTxtFile(impLogAnalyzer.analyzeLog(tarInput), ("result" + listOfFiles.get(filecount)));
+                    impLogAnalyzer.writeToOutputTxtFile(impLogAnalyzer.analyzeLog(tarInput), ("result" + listOfFiles.get(filecount)));
                     filecount++;
                     currentEntry = tarInput.getNextTarEntry(); // iterate to the next file
                 }
