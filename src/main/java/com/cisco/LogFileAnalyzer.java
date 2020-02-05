@@ -99,7 +99,9 @@ public abstract class LogFileAnalyzer {
         return sortedMap;
     }
 
-    protected void writeToOutputTxtFile(Map<String, Long> inputMap, String filename){
+
+
+    protected void writeToOutputTxtFile(String filename, Map<String, Long> inputMap){
         try (FileWriter writer = new FileWriter(filename);
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Long> entry : inputMap.entrySet()) {
@@ -109,6 +111,19 @@ public abstract class LogFileAnalyzer {
             System.err.format("IOException: %s%n", e);
         }
     }
+
+    //Overloaded method
+    protected void writeToOutputTxtFile(Map<String, String> inputMap, String filename){
+        try (FileWriter writer = new FileWriter(filename);
+             BufferedWriter bw = new BufferedWriter(writer)) {
+            for(Map.Entry<String, String> entry : inputMap.entrySet()) {
+                bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
+            }
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
+    }
+
 
     protected List<String> getFileNames(List<String> listOfEntries) {
         List<String> filenames = new ArrayList<>();

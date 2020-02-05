@@ -2,11 +2,10 @@ package com.cisco;
 
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,51 +59,82 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer{
 
     protected static final String SESS_MAN = "sess-man";
 
+    protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b)";
 
-    protected static final String service = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b)";
+    protected SortedMap<String, String> statValuesMap = new TreeMap<>();
+
 
     public StatsLogAnalyzer(){
         this.logType = "stats";
     }
 
-//    protected SortedMap<String, Long> getLastMinutePackets(InputStream inputStream){
-////        String pattern = service + "\\/(Last minute packets)\\s+(\\d+)";
-////        SortedMap<String ,Long> lastMinuteStats = new TreeMap<>();
-////        Pattern r = Pattern.compile(pattern);
-////        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-////            String line;
-////            while ((line = reader.readLine()) != null) {
-////                Matcher m = r.matcher(line);
-////                if(m.find()){
-////                    lastMinuteStats.put(service + "/" + m.group(1) ,Long.parseLong(m.group(2)));
-////                }
-////            }
-////            return lastMinuteStats;
-////        } catch (Exception e) {
-////            System.err.format("Exception occurred trying to read '%s'.", inputStream);
-////            e.printStackTrace();
-////            return Collections.emptySortedMap();
-////        }
-////    }
+//    protected SortedMap<String, Long> getLastPackets(InputStream inputStream){
+//        String pattern = service + "\\/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+//        SortedMap<String ,Long> lastMinuteStats = new TreeMap<>();
+//        Pattern r = Pattern.compile(pattern);
+//        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                Matcher m = r.matcher(line);
+//                if(m.find()){
+//                    lastMinuteStats.put(m.group("serviceName") + "/" + m.group("lastPackets") ,Long.parseLong(m.group("packets")));
+//                }
+//            }
+//            return lastMinuteStats;
+//        } catch (Exception e) {
+//            System.err.format("Exception occurred trying to read '%s'.", inputStream);
+//            e.printStackTrace();
+//            return Collections.emptySortedMap();
+//        }
+//    }
 
-    protected SortedMap<String, Long> getLastPackets(InputStream inputStream){
-        String pattern = service + "\\/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
-        SortedMap<String ,Long> lastMinuteStats = new TreeMap<>();
-        Pattern r = Pattern.compile(pattern);
+
+
+    protected List<String> getStatsValues(InputStream inputStream){
+        List<String> statValues = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                Matcher m = r.matcher(line);
-                if(m.find()){
-                    lastMinuteStats.put(m.group("serviceName") + "/" + m.group("lastPackets") ,Long.parseLong(m.group("packets")));
+                    statValues.add(line);
                 }
-            }
-            return lastMinuteStats;
-        } catch (Exception e) {
-            System.err.format("Exception occurred trying to read '%s'.", inputStream);
+            } catch (IOException e) {
             e.printStackTrace();
-            return Collections.emptySortedMap();
+        }
+        return statValues;
+    }
+
+    protected void getLastPackets(List<String> inputList){
+        String pattern = SERVICE + "\\/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statValuesMap.put(m.group("serviceName") + "/" + m.group("lastPackets") ,(m.group("packets")));
+            }
         }
     }
+
+    protected void getOverflows(List<String> inputList){
+        String pattern = SERVICE + "\\/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statValuesMap.put(m.group("serviceName") + "/" + m.group("overflowType") + " overflow" ,(m.group("packets")));
+            }
+        }
+    }
+
+    protected void getSessManProcessor(List<String> inputList){
+        String pattern = SERVICE + "(/Processor): (.*)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statValuesMap.put(m.group("serviceName") + m.group(2),(m.group(3)));
+            }
+        }
+    }
+
 
 }

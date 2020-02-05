@@ -21,6 +21,8 @@ public class LogAnalyzer {
 
     protected String inputArchiveFilePath;
 
+    protected TarArchiveInputStream  tarInputStream;
+
     protected IMPLogAnalyzer impLogAnalyzer = new IMPLogAnalyzer();
 
     protected StatsLogAnalyzer statsLogAnalyzer = new StatsLogAnalyzer();
@@ -43,11 +45,12 @@ public class LogAnalyzer {
         Matcher m = r.matcher(inputArchiveFile);
         if(m.find()){
             if(m.group().equals(m.group(1))){
-                //openZIPFile();
+                openZIPFile();
                 openZIPFileReadStats();
             }
             else if(m.group().equals(m.group(2))){
-               //openTarGZFile();
+               openTarGZFile();
+//               openTarGZFileReadStats();
             }
             else {
                 System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");
@@ -68,7 +71,7 @@ public class LogAnalyzer {
                     ZipEntry imp = zipFile.getEntry(entry.getName());
                     listOfFiles.add(entry.getName());
                     inputStream = zipFile.getInputStream(imp);
-                    impLogAnalyzer.writeToOutputTxtFile(impLogAnalyzer.analyzeLog(inputStream), ("result" + (impLogAnalyzer.getFileNames(listOfFiles).get(filecount))));
+                    impLogAnalyzer.writeToOutputTxtFile(("result" + (impLogAnalyzer.getFileNames(listOfFiles).get(filecount))), impLogAnalyzer.analyzeLog(inputStream));
                     filecount++;
                 }
             }
@@ -94,30 +97,28 @@ public class LogAnalyzer {
                     ZipEntry stats = zipFile.getEntry(entry.getName());
                     listOfFiles.add(entry.getName());
                     inputStream = zipFile.getInputStream(stats);
-                    statsLogAnalyzer.writeToOutputTxtFile(statsLogAnalyzer.getLastPackets(inputStream), ("result_" + (listOfFiles.get(filecount))));
+                    List<String> statsList;
+                    statsList = statsLogAnalyzer.getStatsValues(inputStream);
+                    statsLogAnalyzer.getLastPackets(statsList);
+                    statsLogAnalyzer.getOverflows(statsList);
+                    statsLogAnalyzer.getSessManProcessor(statsList);
+                    statsLogAnalyzer.writeToOutputTxtFile(statsLogAnalyzer.statValuesMap, "result_" + (listOfFiles.get(filecount)));
                     filecount++;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
-    protected void openTarGZFile(){
-        try(TarArchiveInputStream tarInput = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(inputArchiveFilePath)))){
+    protected void openTarGZFile() {
+        try (TarArchiveInputStream tarInput = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(inputArchiveFilePath)))) {
             int filecount = 0;
             TarArchiveEntry currentEntry = tarInput.getNextTarEntry();
-            while (currentEntry != null){
-                if(!currentEntry.isDirectory() && currentEntry.getName().contains("IMPLog")){
+            while (currentEntry != null) {
+                if (!currentEntry.isDirectory() && currentEntry.getName().contains("IMPLog")) {
                     listOfFiles.add(currentEntry.getName());
-                    impLogAnalyzer.writeToOutputTxtFile(impLogAnalyzer.analyzeLog(tarInput), ("result" + listOfFiles.get(filecount)));
+                    impLogAnalyzer.writeToOutputTxtFile(("result" + listOfFiles.get(filecount)), impLogAnalyzer.analyzeLog(tarInput));
                     filecount++;
                     currentEntry = tarInput.getNextTarEntry(); // iterate to the next file
                 }
@@ -125,6 +126,29 @@ public class LogAnalyzer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    //Something is wrong with reading from tar.gz => java.lang.NullPointerException
+    //	at org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream.read(GzipCompressorInputStream.java:296)
+    //REWORK!
+
+//    protected void openTarGZFileReadStats(){
+//        try (TarArchiveInputStream tarInput = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(inputArchiveFilePath)))) {
+//            int filecount = 0;
+//            TarArchiveEntry currentEntry = tarInput.getNextTarEntry();
+//            while (currentEntry != null) {
+//                if (!currentEntry.isDirectory() && currentEntry.getName().contains(statsLogAnalyzer.logType)) {
+//                    listOfFiles.add(currentEntry.getName());
+//                    statsLogAnalyzer.writeToOutputTxtFile(("result_" + listOfFiles.get(filecount)), statsLogAnalyzer.getLastPackets(tarInput));
+//                    filecount++;
+//                    currentEntry = tarInput.getNextTarEntry(); // iterate to the next file
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
 //        TarArchiveInputStream tarInput = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream("c://temp//test.tar.gz")));
@@ -140,5 +164,6 @@ public class LogAnalyzer {
 ////            }
 ////            currentEntry = tarInput.getNextTarEntry(); // You forgot to iterate to the next file
 ////        }
-    }
+//    }
+
 }
