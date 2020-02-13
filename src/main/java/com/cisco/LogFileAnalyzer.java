@@ -28,26 +28,6 @@ public abstract class LogFileAnalyzer {
 
     protected String logType;
 
-//    public List<String> getTimeFrameList(InputStream inputStream) {
-//        String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
-//        List<String> timeFrame = new ArrayList<>();
-//        Pattern r = Pattern.compile(pattern);
-//        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                Matcher m = r.matcher(line);
-//                if(m.find()){
-//                    timeFrame.add(m.group(1) + "-" + m.group(2) + "-" + m.group(3) + " " + m.group(4) + ":" + m.group(5) + ":" + m.group(6));
-//                }
-//            }
-//            return timeFrame;
-//        } catch (Exception e) {
-//            System.err.format("Exception occurred trying to read '%s'.", inputStream);
-//            e.printStackTrace();
-//            return Collections.emptyList();
-//        }
-//    }
-
     public List<String> getTimeFrameList(InputStream inputStream) {
         String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
         List<String> timeFrame = new ArrayList<>();
@@ -118,8 +98,6 @@ public abstract class LogFileAnalyzer {
         return sortedMap;
     }
 
-
-
     protected void writeToOutputTxtFile(String filename, Map<String, Long> inputMap){
         try (FileWriter writer = new FileWriter(filename);
              BufferedWriter bw = new BufferedWriter(writer)) {
@@ -142,7 +120,6 @@ public abstract class LogFileAnalyzer {
             System.err.format("IOException: %s%n", e);
         }
     }
-
 
     protected List<String> getFileNames(List<String> listOfEntries) {
         List<String> filenames = new ArrayList<>();

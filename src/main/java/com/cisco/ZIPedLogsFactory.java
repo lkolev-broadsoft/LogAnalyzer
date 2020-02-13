@@ -2,7 +2,6 @@ package com.cisco;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -29,8 +28,7 @@ public class ZIPedLogsFactory  extends LogFileAnalyzerFactory {
                     ZipEntry log = zipFile.getEntry(entry.getName());
                     listOfFiles.add(entry.getName());
                     inputStream = zipFile.getInputStream(log);
-                    LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logType);
-                    LogFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))), logFileAnalyzer.analyzeLog(inputStream));
+                    logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(("result" + (logFileFactory.getLogFileAnalyzer(logType).getFileNames(listOfFiles).get(filecount))), logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream));
                     filecount++;
                 }
             }
