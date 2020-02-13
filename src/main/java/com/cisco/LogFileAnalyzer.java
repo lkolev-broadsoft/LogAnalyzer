@@ -28,13 +28,32 @@ public abstract class LogFileAnalyzer {
 
     protected String logType;
 
-    public List<String> getTimeFrameList(InputStream inputStream) {
+//    public List<String> getTimeFrameList(InputStream inputStream) {
+//        String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
+//        List<String> timeFrame = new ArrayList<>();
+//        Pattern r = Pattern.compile(pattern);
+//        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                Matcher m = r.matcher(line);
+//                if(m.find()){
+//                    timeFrame.add(m.group(1) + "-" + m.group(2) + "-" + m.group(3) + " " + m.group(4) + ":" + m.group(5) + ":" + m.group(6));
+//                }
+//            }
+//            return timeFrame;
+//        } catch (Exception e) {
+//            System.err.format("Exception occurred trying to read '%s'.", inputStream);
+//            e.printStackTrace();
+//            return Collections.emptyList();
+//        }
+//    }
 
-//        String pattern = "(20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])\\s(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]):([0-9]{3})\\s(\\w+)\\s\\|\\s(\\bFieldDebug\\b|\\bInfo\\b|\\bDebug\\b|\\bNotice\\b|\\bWarn\\b)\\s+\\|\\s(\\w+)";
+    public List<String> getTimeFrameList(InputStream inputStream) {
         String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
         List<String> timeFrame = new ArrayList<>();
         Pattern r = Pattern.compile(pattern);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
                 Matcher m = r.matcher(line);
