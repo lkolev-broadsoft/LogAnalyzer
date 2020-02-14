@@ -22,7 +22,12 @@ public class LogFileAnalyzerFactory {
         else if(logType.equalsIgnoreCase("ProvisioningAdapterLog")){
             return new ProvisioningAdapterLogAnalyzer();
         }
-        return null;
+        else if(logType.equalsIgnoreCase("stats")){
+            return new StatsLogAnalyzer();
+        }
+        else{
+            return null;
+        }
     }
 
 }

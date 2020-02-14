@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TARGZedLogsFactory extends LogFileAnalyzerFactory {
+public class TARGZedLogsFactory {
 
     protected List<String> listOfFiles = new ArrayList<>();
+
+    protected String logType;
 
     LogFileAnalyzerFactory logFileFactory = new LogFileAnalyzerFactory();
 

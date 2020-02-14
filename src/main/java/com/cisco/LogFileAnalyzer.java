@@ -134,7 +134,7 @@ public abstract class LogFileAnalyzer {
         return filenames;
     }
 
-    protected Map<String, Long> analyzeLog(InputStream inputStream){
+    protected Map analyzeLog(InputStream inputStream){
         seconds = getTimeFrameList(inputStream);
         logsPerSecond = countSeconds(seconds);
         secondsMissingInLog = findPauses(getTimeFrame(logsPerSecond),logsPerSecond);

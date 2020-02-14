@@ -119,21 +119,29 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer{
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
-            if(m.find()){
+            if(m.matches()){
                 statValuesMap.put(m.group("serviceName") + "/" + m.group("overflowType") + " overflow" ,(m.group("packets")));
             }
         }
     }
 
     protected void getSessManProcessor(List<String> inputList){
-        String pattern = SERVICE + "(/Processor): (.*)";
+        String pattern = SERVICE + "(/Processor): (.*),(.*)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statValuesMap.put(m.group("serviceName") + m.group(2),(m.group(3)));
+                statValuesMap.put(m.group("serviceName") + m.group(2) + " " + (m.group(3)), m.group(4));
             }
         }
+    }
+
+    protected Map<String, String> analyzeLog(InputStream inputStream){
+        List<String> statsList = getStatsValues(inputStream);
+        getLastPackets(statsList);
+        getOverflows(statsList);
+        getSessManProcessor(statsList);
+        return statValuesMap;
     }
 
 

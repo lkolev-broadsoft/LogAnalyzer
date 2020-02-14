@@ -33,7 +33,7 @@ public class LogAnalyzer {
         Matcher m = r.matcher(inputArchiveFile);
         if(m.find()){
             if(m.group().equals(m.group(1))){
-                zipLogs.openZIPFile(inputArchiveFilePath, "IMPLog");
+                zipLogs.openZIPFile(inputArchiveFilePath, "stats");
             }
             else if(m.group().equals(m.group(2))){
                 tarGZLogs.openTarGZFile(inputArchiveFilePath,"IMPLog");

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZIPedLogsFactory  extends LogFileAnalyzerFactory {
+public class ZIPedLogsFactory {
 
     protected InputStream inputStream;
 
@@ -28,7 +28,12 @@ public class ZIPedLogsFactory  extends LogFileAnalyzerFactory {
                     ZipEntry log = zipFile.getEntry(entry.getName());
                     listOfFiles.add(entry.getName());
                     inputStream = zipFile.getInputStream(log);
-                    logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(("result" + (logFileFactory.getLogFileAnalyzer(logType).getFileNames(listOfFiles).get(filecount))), logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream));
+                    if(logType.equalsIgnoreCase("stats")){
+                        logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream), "result_" + (listOfFiles.get(filecount)));
+                    }
+                    else {
+                        logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(("result" + (logFileFactory.getLogFileAnalyzer(logType).getFileNames(listOfFiles).get(filecount))), logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream));
+                    }
                     filecount++;
                 }
             }
@@ -42,6 +47,25 @@ public class ZIPedLogsFactory  extends LogFileAnalyzerFactory {
 //                e.printStackTrace();
 //            }
 //        }
+    }
+
+        protected void openZIPFileReadStats(String inputArchiveFilePath, String logType){
+        try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
+            int filecount = 0;
+            entries = zipFile.entries();
+            while(entries.hasMoreElements()){
+                ZipEntry entry = entries.nextElement();
+                if(!entry.isDirectory() && entry.getName().contains(logType)){
+                    ZipEntry log = zipFile.getEntry(entry.getName());
+                    listOfFiles.add(entry.getName());
+                    inputStream = zipFile.getInputStream(log);
+                    logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream), "result_" + (listOfFiles.get(filecount)));
+                    filecount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
