@@ -10,8 +10,6 @@ public class LogAnalyzer {
 
     protected String inputArchiveFilePath;
 
-    protected StatsLogAnalyzer statsLogAnalyzer = new StatsLogAnalyzer();
-
     protected Path archivePath;
 
     protected ZIPedLogsFactory zipLogs = new ZIPedLogsFactory();

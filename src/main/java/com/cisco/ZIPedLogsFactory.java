@@ -49,24 +49,24 @@ public class ZIPedLogsFactory {
 //        }
     }
 
-        protected void openZIPFileReadStats(String inputArchiveFilePath, String logType){
-        try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
-            int filecount = 0;
-            entries = zipFile.entries();
-            while(entries.hasMoreElements()){
-                ZipEntry entry = entries.nextElement();
-                if(!entry.isDirectory() && entry.getName().contains(logType)){
-                    ZipEntry log = zipFile.getEntry(entry.getName());
-                    listOfFiles.add(entry.getName());
-                    inputStream = zipFile.getInputStream(log);
-                    logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream), "result_" + (listOfFiles.get(filecount)));
-                    filecount++;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//        protected void openZIPFileReadStats(String inputArchiveFilePath, String logType){
+//        try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
+//            int filecount = 0;
+//            entries = zipFile.entries();
+//            while(entries.hasMoreElements()){
+//                ZipEntry entry = entries.nextElement();
+//                if(!entry.isDirectory() && entry.getName().contains(logType)){
+//                    ZipEntry log = zipFile.getEntry(entry.getName());
+//                    listOfFiles.add(entry.getName());
+//                    inputStream = zipFile.getInputStream(log);
+//                    logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(logFileFactory.getLogFileAnalyzer(logType).analyzeLog(inputStream), "result_" + (listOfFiles.get(filecount)));
+//                    filecount++;
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
 }

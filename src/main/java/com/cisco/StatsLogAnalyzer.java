@@ -136,11 +136,23 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer{
         }
     }
 
+    protected void getCPUusage(List<String> inputList){
+        String pattern = SERVICE + "\\/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage) (.*)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statValuesMap.put(m.group("serviceName") + "/" + m.group("usageType"), m.group(4));
+            }
+        }
+    }
+
     protected Map<String, String> analyzeLog(InputStream inputStream){
         List<String> statsList = getStatsValues(inputStream);
         getLastPackets(statsList);
         getOverflows(statsList);
         getSessManProcessor(statsList);
+        getCPUusage(statsList);
         return statValuesMap;
     }
 
