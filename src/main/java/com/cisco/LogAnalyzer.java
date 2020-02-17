@@ -42,28 +42,4 @@ public class LogAnalyzer {
         }
     }
 
-//    protected void openZIPFileReadStats(){
-//        try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
-//            int filecount = 0;
-//            entries = zipFile.entries();
-//            while(entries.hasMoreElements()){
-//                ZipEntry entry = entries.nextElement();
-//                if(!entry.isDirectory() && entry.getName().contains(statsLogAnalyzer.logType)){
-//                    ZipEntry stats = zipFile.getEntry(entry.getName());
-//                    listOfFiles.add(entry.getName());
-//                    inputStream = zipFile.getInputStream(stats);
-//                    List<String> statsList;
-//                    statsList = statsLogAnalyzer.getStatsValues(inputStream);
-//                    statsLogAnalyzer.getLastPackets(statsList);
-//                    statsLogAnalyzer.getOverflows(statsList);
-//                    statsLogAnalyzer.getSessManProcessor(statsList);
-//                    statsLogAnalyzer.writeToOutputTxtFile(statsLogAnalyzer.statValuesMap, "result_" + (listOfFiles.get(filecount)));
-//                    filecount++;
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 }
