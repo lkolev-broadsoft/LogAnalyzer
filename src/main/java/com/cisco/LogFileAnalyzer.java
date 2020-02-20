@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public abstract class LogFileAnalyzer {
+public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     protected static final String DATE_REGEX = "(20\\d\\d)\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])";
 
@@ -98,10 +98,10 @@ public abstract class LogFileAnalyzer {
         return sortedMap;
     }
 
-    protected void writeToOutputTxtFile(String filename, Map<String, Long> inputMap){
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
         try (FileWriter writer = new FileWriter(filename);
              BufferedWriter bw = new BufferedWriter(writer)) {
-            for(Map.Entry<String, Long> entry : inputMap.entrySet()) {
+            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
             }
         } catch (IOException e) {

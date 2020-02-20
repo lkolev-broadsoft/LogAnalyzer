@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>groupId</groupId>
-    <artifactId>LogAnalyzer</artifactId>
+    <groupId>com.broadsoft.ums</groupId>
+    <artifactId>logAnalyzer</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
@@ -15,25 +15,22 @@
             <artifactId>commons-compress</artifactId>
             <version>1.20</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-vfs2 -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-vfs2</artifactId>
-            <version>2.6.0</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/net.java.truevfs/truevfs-access -->
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
         <dependency>
-            <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-access</artifactId>
-            <version>0.12.2</version>
-            <scope>test</scope>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.12</artifactId>
+            <version>2.4.5</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/net.java.truevfs/truevfs-driver-tar-gzip -->
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
         <dependency>
-            <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-driver-tar-gzip</artifactId>
-            <version>0.12.2</version>
-            <scope>runtime</scope>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_2.12</artifactId>
+            <version>2.4.5</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -42,10 +39,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-access</artifactId>
-            <version>0.12.2</version>
-            <scope>compile</scope>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_2.11</artifactId>
+            <version>2.4.5</version>
         </dependency>
     </dependencies>
 

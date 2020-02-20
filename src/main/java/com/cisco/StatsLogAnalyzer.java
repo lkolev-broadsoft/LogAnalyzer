@@ -1,15 +1,12 @@
 package com.cisco;
 
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StatsLogAnalyzer  extends  LogFileAnalyzer{
+public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWriter{
 
     protected static final String MESSAGE_ROUTER = "message-router";
 
@@ -61,38 +58,20 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer{
 
     protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b)";
 
-    protected SortedMap<String, String> statValuesMap = new TreeMap<>();
+    protected static final String STATS_DATE_REGEX = "(?<year>20\\d\\d)\\-(?<month>0[1-9]|1[012])\\-(?<day>0[1-9]|[12][0-9]|3[01])";
 
+    protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])/(?<minute>[0-5][0-9])/(?<second>[0-5][0-9])";
+
+    protected SortedMap<String, String> statValuesMap = new TreeMap<>();
 
     public StatsLogAnalyzer(){
         this.logType = "stats";
     }
-
-//    protected SortedMap<String, Long> getLastPackets(InputStream inputStream){
-//        String pattern = service + "\\/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
-//        SortedMap<String ,Long> lastMinuteStats = new TreeMap<>();
-//        Pattern r = Pattern.compile(pattern);
-//        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                Matcher m = r.matcher(line);
-//                if(m.find()){
-//                    lastMinuteStats.put(m.group("serviceName") + "/" + m.group("lastPackets") ,Long.parseLong(m.group("packets")));
-//                }
-//            }
-//            return lastMinuteStats;
-//        } catch (Exception e) {
-//            System.err.format("Exception occurred trying to read '%s'.", inputStream);
-//            e.printStackTrace();
-//            return Collections.emptySortedMap();
-//        }
-//    }
-
-
-
+    
     protected List<String> getStatsValues(InputStream inputStream){
         List<String> statValues = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream)); // Not closing due to NullPonterException in gzipCompressorInputStream
             String line;
             while ((line = reader.readLine()) != null) {
                     statValues.add(line);
@@ -147,12 +126,34 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer{
         }
     }
 
+    protected void extractTimeFromFilename(List<String> listOfFiles){
+        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
+        Pattern r = Pattern.compile(pattern);
+        for(String line : listOfFiles){
+            Matcher m = r.matcher(line);
+            if(m.matches()){
+                statValuesMap.put(m.group("serviceName") + "/" + m.group("usageType"), m.group(4));
+            }
+        }
+    }
+
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
+        try (FileWriter writer = new FileWriter(filename);
+             BufferedWriter bw = new BufferedWriter(writer)) {
+            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
+            }
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
+    }
+
     protected Map<String, String> analyzeLog(InputStream inputStream){
         List<String> statsList = getStatsValues(inputStream);
-        getLastPackets(statsList);
-        getOverflows(statsList);
-        getSessManProcessor(statsList);
-        getCPUusage(statsList);
+//        getLastPackets(statsList);
+//        getOverflows(statsList);
+//        getSessManProcessor(statsList);
+//        getCPUusage(statsList);
         return statValuesMap;
     }
 

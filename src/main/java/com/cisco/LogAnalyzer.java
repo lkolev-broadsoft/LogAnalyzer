@@ -12,9 +12,9 @@ public class LogAnalyzer {
 
     protected Path archivePath;
 
-    protected ZIPedLogsFactory zipLogs = new ZIPedLogsFactory();
+    protected Factory zipLogs = new ZIPedLogsFactory();
 
-    protected TARGZedLogsFactory tarGZLogs = new TARGZedLogsFactory();
+    protected Factory tarGZLogs = new TARGZedLogsFactory();
 
     public LogAnalyzer(String inputArchiveFilePath){
         this.inputArchiveFilePath = inputArchiveFilePath;
@@ -25,16 +25,16 @@ public class LogAnalyzer {
     //Take actions according to the type of logs provided.
     //Go through all of the logs
 
-    protected void determineArchiveType(String inputArchiveFile){
+    protected void determineArchiveType(String inputArchiveFile){ //Make public
         String pattern = "(\\.zip)|(\\.tar\\.gz)";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(inputArchiveFile);
         if(m.find()){
             if(m.group().equals(m.group(1))){
-                zipLogs.openZIPFile(inputArchiveFilePath, "stats");
+                zipLogs.open(inputArchiveFilePath, "stats");
             }
             else if(m.group().equals(m.group(2))){
-                tarGZLogs.openTarGZFile(inputArchiveFilePath,"IMPLog");
+                tarGZLogs.open(inputArchiveFilePath,"stats");
             }
             else {
                 System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");

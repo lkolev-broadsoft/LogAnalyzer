@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZIPedLogsFactory {
+public class ZIPedLogsFactory implements Factory{
 
     protected InputStream inputStream;
 
@@ -18,7 +18,8 @@ public class ZIPedLogsFactory {
 
     LogFileAnalyzerFactory logFileFactory = new LogFileAnalyzerFactory();
 
-    protected void openZIPFile(String inputArchiveFilePath, String logType){
+    @Override
+    public void open(String inputArchiveFilePath, String logType) {
         try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
             int filecount = 0;
             entries = zipFile.entries();
@@ -40,15 +41,5 @@ public class ZIPedLogsFactory {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        finally {
-//            try {
-//                inputStream.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
-
-
-
 }
