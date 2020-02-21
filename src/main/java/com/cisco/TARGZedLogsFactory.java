@@ -11,33 +11,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TARGZedLogsFactory implements TARGZInterface {
+public class TARGZedLogsFactory implements TARGZFactory {
 
 
 
     protected List<String> listOfFiles = new ArrayList<>();
 
-    protected String logType;
-
-    LogFileAnalyzerFactory logFileFactory = new LogFileAnalyzerFactory();
+    OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
 
     @Override
-    public void open(String inputArchiveFilePath, String logType) {
+    public void open(String inputArchiveFilePath) {
         try (FileInputStream fileInputStream = new FileInputStream(inputArchiveFilePath);
              GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(fileInputStream);
              TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream)) {
             int filecount = 0;
             TarArchiveEntry currentEntry;
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
-                if (!currentEntry.isDirectory() && currentEntry.getName().contains(logType)) {
-                    listOfFiles.add(currentEntry.getName());
-                    if (logType.equals("stats")) {
-                        logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile(logFileFactory.getLogFileAnalyzer(logType).analyzeLog(tarArchiveInputStream), "result_" + (listOfFiles.get(filecount)));
-                    } else {
-                        Map<String, Long> results = logFileFactory.getLogFileAnalyzer(logType).analyzeLog(tarArchiveInputStream);
-                        logFileFactory.getLogFileAnalyzer(logType).writeToOutputTxtFile("result" + listOfFiles.get(filecount), results);
-                    }
+                //if (!currentEntry.isDirectory() && currentEntry.getName().contains(logType)) {
+                if(!currentEntry.isDirectory()){
+                    String logFileName = currentEntry.getName();
+                    listOfFiles.add(logFileName);
+                    Map<String, Object> results = logFileFactory.getLogFileAnalyzer(logFileName).analyzeLog(tarArchiveInputStream);
+                    logFileFactory.getLogFileAnalyzer(logFileName).writeToOutputTxtFile("result" + listOfFiles.get(filecount), results);
                     filecount++;
                 }
             }

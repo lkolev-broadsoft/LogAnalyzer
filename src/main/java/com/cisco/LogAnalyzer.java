@@ -12,9 +12,9 @@ public class LogAnalyzer {
 
     protected Path archivePath;
 
-    protected Factory zipLogs = new ZIPedLogsFactory();
+    protected ZIPedLogsFactory zipLogs = new ZIPedLogsFactory();
 
-    protected Factory tarGZLogs = new TARGZedLogsFactory();
+    protected TARGZedLogsFactory tarGZLogs = new TARGZedLogsFactory();
 
     public LogAnalyzer(String inputArchiveFilePath){
         this.inputArchiveFilePath = inputArchiveFilePath;
@@ -31,10 +31,10 @@ public class LogAnalyzer {
         Matcher m = r.matcher(inputArchiveFile);
         if(m.find()){
             if(m.group().equals(m.group(1))){
-                zipLogs.open(inputArchiveFilePath, "stats");
+                zipLogs.open(inputArchiveFilePath);
             }
             else if(m.group().equals(m.group(2))){
-                tarGZLogs.open(inputArchiveFilePath,"stats");
+                tarGZLogs.open(inputArchiveFilePath);
             }
             else {
                 System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");

@@ -109,18 +109,6 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         }
     }
 
-    //Overloaded method
-    protected void writeToOutputTxtFile(Map<String, String> inputMap, String filename){
-        try (FileWriter writer = new FileWriter(filename);
-             BufferedWriter bw = new BufferedWriter(writer)) {
-            for(Map.Entry<String, String> entry : inputMap.entrySet()) {
-                bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
-            }
-        } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
-        }
-    }
-
     protected List<String> getFileNames(List<String> listOfEntries) {
         List<String> filenames = new ArrayList<>();
         String pattern = logType + "(\\d{4}\\.\\d{2}\\.\\d{2})-(\\d{2}\\.\\d{2}\\.\\d{2})(.txt)";

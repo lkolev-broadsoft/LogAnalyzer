@@ -150,10 +150,10 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected Map<String, String> analyzeLog(InputStream inputStream){
         List<String> statsList = getStatsValues(inputStream);
-//        getLastPackets(statsList);
-//        getOverflows(statsList);
-//        getSessManProcessor(statsList);
-//        getCPUusage(statsList);
+        getLastPackets(statsList);
+        getOverflows(statsList);
+        getSessManProcessor(statsList);
+        getCPUusage(statsList);
         return statValuesMap;
     }
 
