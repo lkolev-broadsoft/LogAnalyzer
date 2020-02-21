@@ -28,12 +28,12 @@ public class TARGZedLogsFactory implements TARGZFactory {
             int filecount = 0;
             TarArchiveEntry currentEntry;
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
-                //if (!currentEntry.isDirectory() && currentEntry.getName().contains(logType)) {
                 if(!currentEntry.isDirectory()){
                     String logFileName = currentEntry.getName();
                     listOfFiles.add(logFileName);
-                    Map<String, Object> results = logFileFactory.getLogFileAnalyzer(logFileName).analyzeLog(tarArchiveInputStream);
-                    logFileFactory.getLogFileAnalyzer(logFileName).writeToOutputTxtFile("result" + listOfFiles.get(filecount), results);
+                    LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
+                    Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream);
+                    logFileAnalyzer.writeToOutputTxtFile("result" + listOfFiles.get(filecount), results);
                     filecount++;
                 }
             }

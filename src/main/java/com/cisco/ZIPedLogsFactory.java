@@ -26,15 +26,14 @@ public class ZIPedLogsFactory implements ZIPFactory {
             entries = zipFile.entries();
             while(entries.hasMoreElements()){
                 ZipEntry entry = entries.nextElement();
-               //// logFileFactory.getLogType(entry.getName());
-               // if(!entry.isDirectory() && entry.getName().contains(logType)){ //Use factory pattern to create IMPLogAnalyzer or PresenceLogAnalyzer
                 if(!entry.isDirectory()){
                     String logFileName = entry.getName();
                     ZipEntry zipEntry = zipFile.getEntry(logFileName);
                     listOfFiles.add(logFileName);
                     inputStream = zipFile.getInputStream(zipEntry);
-                    Map<String, Object> results = logFileFactory.getLogFileAnalyzer(logFileName).analyzeLog(inputStream);
-                    logFileFactory.getLogFileAnalyzer(logFileName).writeToOutputTxtFile(("result" + (logFileFactory.getLogFileAnalyzer(logFileName).getFileNames(listOfFiles).get(filecount))),results);
+                    LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
+                    Map<String, Object> results = logFileAnalyzer.analyzeLog(inputStream);
+                    logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))),results);
                     filecount++;
                 }
             }
