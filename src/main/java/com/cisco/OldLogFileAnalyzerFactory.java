@@ -13,7 +13,6 @@ public class OldLogFileAnalyzerFactory {
     protected static final String PROVISIONING_ADAPTER_LOG = "ProvisioningAdapterLog";
     protected static final String STATS_LOG = "stats";
 
-
     public LogFileAnalyzer getLogFileAnalyzer(String logFileName){
         String logFileType = getLogType(logFileName);
         if(logFileType == null){

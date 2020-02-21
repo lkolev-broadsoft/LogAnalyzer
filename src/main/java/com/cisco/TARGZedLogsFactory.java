@@ -13,12 +13,9 @@ import java.util.Map;
 
 public class TARGZedLogsFactory implements TARGZFactory {
 
-
-
     protected List<String> listOfFiles = new ArrayList<>();
 
     OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
-
 
     @Override
     public void open(String inputArchiveFilePath) {
