@@ -1,5 +1,8 @@
 package com.cisco;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +31,8 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     protected String logType;
 
+    protected static final Logger logger = LoggerFactory.getLogger(LogFileAnalyzer.class);
+
     public List<String> getTimeFrameList(InputStream inputStream) {
         String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
         List<String> timeFrame = new ArrayList<>();
@@ -43,8 +48,9 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
             }
             return timeFrame;
         } catch (Exception e) {
-            System.err.format("Exception occurred trying to read '%s'.", inputStream);
-            e.printStackTrace();
+//            System.err.format("Exception occurred trying to read '%s'.", inputStream);
+//            e.printStackTrace();
+            logger.error("Exception occurred trying to read '%s'.");
             return Collections.emptyList();
         }
     }
@@ -105,7 +111,8 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
             }
         } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
+//            System.err.format("IOException: %s%n", e);
+            logger.error("IOException: %s%n", e);
         }
     }
 

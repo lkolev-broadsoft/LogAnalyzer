@@ -77,13 +77,14 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                     statValues.add(line);
                 }
             } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            logger.error("IOException while reading inputStream from stats logs", e);
         }
         return statValues;
     }
 
     protected void getLastPackets(List<String> inputList){
-        String pattern = SERVICE + "\\/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
@@ -144,7 +145,8 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
             }
         } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
+          //  System.err.format("IOException: %s%n", e);
+            logger.error("IOException while writing to Output text file.", e);
         }
     }
 

@@ -1,5 +1,8 @@
 package com.cisco;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,6 +10,8 @@ public interface ArchiveFactory {
 
     ZIPedLogsFactory zipLogs = new ZIPedLogsFactory();
     TARGZedLogsFactory tarGZLogs = new TARGZedLogsFactory();
+
+    Logger logger = LoggerFactory.getLogger(ArchiveFactory.class);
 
     void open(String inputArchiveFilePath);
 
@@ -22,7 +27,8 @@ public interface ArchiveFactory {
                 tarGZLogs.open(inputArchiveFilePath);
             }
             else {
-                System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");
+//                System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");
+            logger.error("Unsupported input type, only zip and tar.gz files are accepted.");
             }
         }
     }
