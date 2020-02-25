@@ -10,6 +10,7 @@ public interface ArchiveFactory {
 
     ZIPedLogsFactory zipLogs = new ZIPedLogsFactory();
     TARGZedLogsFactory tarGZLogs = new TARGZedLogsFactory();
+    DirectoryFactory directoryLogs = new DirectoryFactory();
 
     Logger logger = LoggerFactory.getLogger(ArchiveFactory.class);
 
@@ -28,8 +29,11 @@ public interface ArchiveFactory {
             }
             else {
 //                System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");
-            logger.error("Unsupported input type, only zip and tar.gz files are accepted.");
+            logger.error("Unsupported input type, only zip and tar.gz  or directories files are accepted.");
             }
+        }
+        else {
+            directoryLogs.open(inputArchiveFilePath);
         }
     }
 
