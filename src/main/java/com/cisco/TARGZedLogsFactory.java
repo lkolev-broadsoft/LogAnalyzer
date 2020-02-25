@@ -34,7 +34,6 @@ public class TARGZedLogsFactory implements TARGZFactory {
                 }
             }
         } catch (IOException e) {
-  //          e.printStackTrace();
             logger.error("IOException while opening TAR archive.",e);
         }
     }

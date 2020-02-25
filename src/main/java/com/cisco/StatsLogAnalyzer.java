@@ -77,7 +77,6 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                     statValues.add(line);
                 }
             } catch (IOException e) {
-//            e.printStackTrace();
             logger.error("IOException while reading inputStream from stats logs", e);
         }
         return statValues;
@@ -95,7 +94,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     }
 
     protected void getOverflows(List<String> inputList){
-        String pattern = SERVICE + "\\/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
+        String pattern = SERVICE + "/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
@@ -117,7 +116,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     }
 
     protected void getCPUusage(List<String> inputList){
-        String pattern = SERVICE + "\\/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage) (.*)";
+        String pattern = SERVICE + "/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage) (.*)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
@@ -145,7 +144,6 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
             }
         } catch (IOException e) {
-          //  System.err.format("IOException: %s%n", e);
             logger.error("IOException while writing to Output text file.", e);
         }
     }

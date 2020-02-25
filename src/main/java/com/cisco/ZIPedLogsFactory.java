@@ -38,7 +38,6 @@ public class ZIPedLogsFactory implements ZIPFactory {
                 }
             }
         } catch (IOException e) {
-    //        e.printStackTrace();
             logger.error("IOException while opening ZIP archive.",e);
         }
     }

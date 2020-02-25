@@ -48,9 +48,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
             }
             return timeFrame;
         } catch (Exception e) {
-//            System.err.format("Exception occurred trying to read '%s'.", inputStream);
-//            e.printStackTrace();
-            logger.error("Exception occurred trying to read '%s'.");
+            logger.error("Exception occurred trying to read getTimeFrameList inputStream", e);
             return Collections.emptyList();
         }
     }
@@ -111,7 +109,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
             }
         } catch (IOException e) {
-//            System.err.format("IOException: %s%n", e);
+
             logger.error("IOException: %s%n", e);
         }
     }

@@ -28,8 +28,7 @@ public interface ArchiveFactory {
                 tarGZLogs.open(inputArchiveFilePath);
             }
             else {
-//                System.out.println("Unsupported input type, only zip and tar.gz files are accepted.");
-            logger.error("Unsupported input type, only zip and tar.gz  or directories files are accepted.");
+                logger.error("Unsupported input type, only zip and tar.gz  or directories files are accepted.");
             }
         }
         else {
