@@ -28,7 +28,7 @@ public class TARGZedLogsFactory implements TARGZFactory {
                     String logFileName = currentEntry.getName();
                     listOfFiles.add(logFileName);
                     LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-                    Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream);
+                    Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream, logFileName);
                     logFileAnalyzer.writeToOutputTxtFile("result" + listOfFiles.get(filecount), results);
                     filecount++;
                 }

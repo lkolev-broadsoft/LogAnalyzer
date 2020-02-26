@@ -28,7 +28,7 @@ public class DirectoryFactory implements ArchiveFactory {
                 listOfFiles.add(logFileName);
                 fileInputStream = new FileInputStream(path.toFile());
                 LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-                Map<String, Object> results = logFileAnalyzer.analyzeLog(fileInputStream);
+                Map<String, Object> results = logFileAnalyzer.analyzeLog(fileInputStream,logFileName);
                 logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))), results);
                 filecount++;
             }

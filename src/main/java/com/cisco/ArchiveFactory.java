@@ -6,6 +6,17 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+
+D
+
+ */
+
+/**
+ *  Determines the type of archive and has a open method to open the archive.
+ *
+ * @author lkolev
+ */
 public interface ArchiveFactory {
 
     ZIPedLogsFactory zipLogs = new ZIPedLogsFactory();

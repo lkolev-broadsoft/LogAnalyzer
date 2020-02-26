@@ -127,7 +127,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         return filenames;
     }
 
-    protected Map analyzeLog(InputStream inputStream){
+    protected Map analyzeLog(InputStream inputStream, String logFileName){
         seconds = getTimeFrameList(inputStream);
         logsPerSecond = countSeconds(seconds);
         secondsMissingInLog = findPauses(getTimeFrame(logsPerSecond),logsPerSecond);

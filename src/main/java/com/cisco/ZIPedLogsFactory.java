@@ -32,7 +32,7 @@ public class ZIPedLogsFactory implements ZIPFactory {
                     listOfFiles.add(logFileName);
                     inputStream = zipFile.getInputStream(zipEntry);
                     LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-                    Map<String, Object> results = logFileAnalyzer.analyzeLog(inputStream);
+                    Map<String, Object> results = logFileAnalyzer.analyzeLog(inputStream, logFileName);
                     logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))),results);
                     filecount++;
                 }

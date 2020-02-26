@@ -15,6 +15,7 @@ import java.util.List;
 
 public class LogDataSet {
 
+//    First try
     SparkSession spark = SparkSession.builder().appName("Build a DataFrame from Scratch").master("local[*]")
             .getOrCreate();
 
@@ -30,5 +31,26 @@ public class LogDataSet {
                     DataTypes.createStructField("foe2", DataTypes.StringType, false) });
 
     Dataset<Row> df = spark.sqlContext().createDataFrame(rowRDD, schema).toDF();
+
+
+    //Second try
+//    SparkSession sparkSession = SparkSession.builder().master("SparkMasterURL")
+//            .appName("DatasetCreation")
+//            .config("spark.local.dir","/tmp")
+//            .getOrCreate();
+//
+//    Dataset<Row> dataset = sparkSession.emptyDataFrame(); //Create an empty dataset
+//
+//    Dataset<Row> c2cPacketsPerHour = sparkSession.read().format("txt").load("/lkolev/Test/c2cPacketsPerHour");
+//
+//    StructType structure = c2cPacketsPerHour.select("c2cPacketsPerHour").schema();
+
+//    List<Row> rows = new ArrayList<Row>();
+    // No values added to the list.﻿
+
+//    Dataset<Row> schema = sparkSession.createDataFrame(rows, structure);
+
+//    schema.show()
+
 
 }
