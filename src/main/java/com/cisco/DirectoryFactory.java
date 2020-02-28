@@ -18,6 +18,10 @@ public class DirectoryFactory implements ArchiveFactory {
 
     OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
+    public DirectoryFactory(String inputPath) {
+        open(inputPath);
+    }
+
     @Override
     public void open(String inputArchiveFilePath) {
         Path directoryPath = Paths.get(inputArchiveFilePath);

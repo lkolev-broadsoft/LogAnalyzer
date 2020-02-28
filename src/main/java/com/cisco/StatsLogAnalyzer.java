@@ -1,6 +1,8 @@
 package com.cisco;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,13 +59,17 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b)";
 
-    protected static final String STATS_DATE_REGEX = "(?<year>20\\d\\d)\\-(?<month>0[1-9]|1[012])\\-(?<day>0[1-9]|[12][0-9]|3[01])";
+    protected static final String STATS_DATE_REGEX = "(?<year>20\\d\\d)-(?<month>0[1-9]|1[012])-(?<day>0[1-9]|[12][0-9]|3[01])";
 
-    protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])/(?<minute>[0-5][0-9])/(?<second>[0-5][0-9])";
+    protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])[:|_|/](?<minute>[0-5][0-9])[:|_|/](?<second>[0-5][0-9])";
 
     protected SortedMap<String, String> statValuesMap = new TreeMap<>();
 
-    protected SortedMap<String, String> results = new TreeMap<>();
+    //protected SortedMap<String, String> results = new TreeMap<>();
+
+    protected StatisticData[] statisticDataArray;
+
+    protected StatisticData statisticData;
 
 
     public StatsLogAnalyzer(){
@@ -152,28 +158,62 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //        }
 //    }
 
-    protected List<String> extractTimeFromFilename(String fileName){
-        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(fileName);
-        List<String> time = new ArrayList<>();
-        if(m.matches()){
-            time.add(m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " "
-                            + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"));
-        }
-        return time;
-    }
+//    protected List<String> extractTimeFromFilename(String fileName){
+//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
+//        Pattern r = Pattern.compile(pattern);
+//        Matcher m = r.matcher(fileName);
+//        List<String> time = new ArrayList<>();
+//        if(m.matches()){
+//            time.add(m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " "
+//                            + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"));
+//        }
+//        return time;
+//    }
 
-        protected String extractTimeStringFromFilename(String fileName){
+//        protected String extractTimeStringFromFilename(String fileName){
+//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
+//        Pattern r = Pattern.compile(pattern);
+//        Matcher m = r.matcher(fileName);
+//        String time = "Couldn't extract Time";
+//        if(m.matches()){
+//            time = (m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " "
+//                    + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"));
+//        }
+//        return time;
+//    }
+
+    /*
+    Create a StatisticDate object and add the time from the fileName as a time in StatisticData object.
+     */
+//    protected StatisticData extractLocalDateTimeFromFilename(String fileName){
+//        StatisticData statisticDataTime = new StatisticData();
+//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
+//        Pattern r = Pattern.compile(pattern);
+//        Matcher m = r.matcher(fileName);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        LocalDateTime localDateTime = null;
+//        if(m.find()){
+//            localDateTime = LocalDateTime.parse(m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " " + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"), formatter);
+//        }
+//        statisticDataTime.setTime(localDateTime);
+//        return statisticDataTime;
+//    }
+
+
+    //Extract LocalDateTime from fileName (One responsibility, only)
+
+    protected LocalDateTime extractLocalDateTimeFromFilename(String fileName){
+        StatisticData statisticDataTime = new StatisticData();
         String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(fileName);
-        String time = "Couldn't extract Time";
-        if(m.matches()){
-            time = (m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " "
-                    + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime localDateTime = null;
+        if(m.find()){
+            localDateTime = LocalDateTime.parse(m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " " + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"), formatter);
         }
-        return time;
+        statisticDataTime.setTime(localDateTime);
+        return localDateTime;
     }
 
 //    protected Map<String,Long> getStatisticValueAtTime(String fileName , List<String> statsList){

@@ -19,6 +19,10 @@ public class ZIPedLogsFactory implements ZIPFactory {
 
     OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
+    public ZIPedLogsFactory(String inputArchivePath) {
+        open(inputArchivePath);
+    }
+
     @Override
     public void open(String inputArchiveFilePath) {
         try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){

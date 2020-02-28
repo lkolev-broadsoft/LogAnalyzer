@@ -16,6 +16,10 @@ public class TARGZedLogsFactory implements TARGZFactory {
 
     OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
+    public TARGZedLogsFactory(String inputArchivePath) {
+        open(inputArchivePath);
+    }
+
     @Override
     public void open(String inputArchiveFilePath) {
         try (FileInputStream fileInputStream = new FileInputStream(inputArchiveFilePath);
