@@ -67,7 +67,9 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     //protected SortedMap<String, String> results = new TreeMap<>();
 
-    protected StatisticData[] statisticDataArray;
+//    protected StatisticData[] statisticDataArray;
+
+    protected static ArrayList<StatisticData> statisticDataArrayList = new ArrayList<>();
 
     protected StatisticData statisticData;
 
@@ -104,7 +106,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //    protected ArrayList<String> getLastPacketsAsList(List<String> inputList){
 //        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
 //        Pattern r = Pattern.compile(pattern);
-//        ArrayList<String> results;
+//        ArrayList<String> results = null;
 //        for(String line : inputList){
 //            Matcher m = r.matcher(line);
 //            if(m.find()){
@@ -113,6 +115,22 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //        }
 //        return results;
 //    }
+
+
+    // Use to add statisticName and value to a StatisticData object
+
+    protected SortedMap<String,Long> getLastPacketsAsMap(List<String> inputList){
+        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        SortedMap<String,Long> results = new TreeMap<>();
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                results.put(m.group("serviceName") + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
+            }
+        }
+        return results;
+    }
 
     protected void getOverflows(List<String> inputList){
         String pattern = SERVICE + "/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
@@ -146,59 +164,6 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             }
         }
     }
-
-//    protected void extractTimeFromFilename(List<String> listOfFiles){
-//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
-//        Pattern r = Pattern.compile(pattern);
-//        for(String line : listOfFiles){
-//            Matcher m = r.matcher(line);
-//            if(m.matches()){
-//                statValuesMap.put(m.group("serviceName") + "/" + m.group("usageType"), m.group(4));
-//            }
-//        }
-//    }
-
-//    protected List<String> extractTimeFromFilename(String fileName){
-//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
-//        Pattern r = Pattern.compile(pattern);
-//        Matcher m = r.matcher(fileName);
-//        List<String> time = new ArrayList<>();
-//        if(m.matches()){
-//            time.add(m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " "
-//                            + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"));
-//        }
-//        return time;
-//    }
-
-//        protected String extractTimeStringFromFilename(String fileName){
-//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
-//        Pattern r = Pattern.compile(pattern);
-//        Matcher m = r.matcher(fileName);
-//        String time = "Couldn't extract Time";
-//        if(m.matches()){
-//            time = (m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " "
-//                    + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"));
-//        }
-//        return time;
-//    }
-
-    /*
-    Create a StatisticDate object and add the time from the fileName as a time in StatisticData object.
-     */
-//    protected StatisticData extractLocalDateTimeFromFilename(String fileName){
-//        StatisticData statisticDataTime = new StatisticData();
-//        String pattern = STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
-//        Pattern r = Pattern.compile(pattern);
-//        Matcher m = r.matcher(fileName);
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        LocalDateTime localDateTime = null;
-//        if(m.find()){
-//            localDateTime = LocalDateTime.parse(m.group("year") + "-" + m.group("month") + "-" + m.group("day") + " " + m.group("hour") + ":" + m.group("minute") + ":" + m.group("second"), formatter);
-//        }
-//        statisticDataTime.setTime(localDateTime);
-//        return statisticDataTime;
-//    }
-
 
     //Extract LocalDateTime from fileName (One responsibility, only)
 
@@ -247,12 +212,22 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
+
+    //Use builder later not this method
+    protected StatisticData createStatisticDataObject(SortedMap inputMap, LocalDateTime time){
+        StatisticData statisticData = new StatisticData(time,"c2s/Last hour packets", (Long) inputMap.get("c2s/Last hour packets"));
+        return statisticData;
+    }
+
     protected Map<String, String> analyzeLog(InputStream inputStream, String logFileName){
         List<String> statsList = getStatsValues(inputStream);
         getLastPackets(statsList);
         getOverflows(statsList);
         getSessManProcessor(statsList);
         getCPUusage(statsList);
+        SortedMap<String,Long> testMap = getLastPacketsAsMap(statsList);
+        statisticData = createStatisticDataObject(testMap,extractLocalDateTimeFromFilename(logFileName));
+        statisticDataArrayList.add(statisticData);
         return statValuesMap;
     }
 

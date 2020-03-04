@@ -6,6 +6,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,12 @@ public class TARGZedLogsFactory implements TARGZFactory {
     public TARGZedLogsFactory(String inputArchivePath) {
         open(inputArchivePath);
     }
+
+    public void read(InputStream inputStream){
+    }
+
+
+     //Extract read(input Stream) method from open
 
     @Override
     public void open(String inputArchiveFilePath) {
