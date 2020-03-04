@@ -35,9 +35,11 @@ public class ZIPedLogsFactory implements ZIPFactory {
                     ZipEntry zipEntry = zipFile.getEntry(logFileName);
                     listOfFiles.add(logFileName);
                     inputStream = zipFile.getInputStream(zipEntry);
+                    //Code for extraction
                     LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
                     Map<String, Object> results = logFileAnalyzer.analyzeLog(inputStream, logFileName);
                     logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))),results);
+                    //Code for extraction
                     filecount++;
                 }
             }

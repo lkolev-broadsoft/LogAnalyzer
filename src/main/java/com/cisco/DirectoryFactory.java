@@ -31,9 +31,11 @@ public class DirectoryFactory implements ArchiveFactory {
                 String logFileName = String.valueOf(path.getFileName());
                 listOfFiles.add(logFileName);
                 fileInputStream = new FileInputStream(path.toFile());
+                //code for extraction
                 LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
                 Map<String, Object> results = logFileAnalyzer.analyzeLog(fileInputStream,logFileName);
                 logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))), results);
+                //code for extraction
                 filecount++;
             }
         } catch (IOException e) {
