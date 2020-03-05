@@ -9,7 +9,7 @@ public class StatisticData {
     private Long value;
     private Long normalValue;
 
-    public StatisticData(){
+    public StatisticData(LocalDateTime time, String serverStatistic, Long value, Long normalValue){
     }
 
     public StatisticData(LocalDateTime time) {

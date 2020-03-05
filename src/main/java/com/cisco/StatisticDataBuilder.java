@@ -24,7 +24,12 @@ public class StatisticDataBuilder {
         return this;
     }
 
+    public StatisticDataBuilder setNornalValue(Long normalValue){
+        this.normalValue = normalValue;
+        return this;
+    }
+
     public StatisticData createStatisticData() {
-        return new StatisticData(time);
+        return new StatisticData(time,serverStatistic,value, normalValue);
     }
 }

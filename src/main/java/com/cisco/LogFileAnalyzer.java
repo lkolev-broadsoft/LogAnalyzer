@@ -33,6 +33,8 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     protected static final Logger logger = LoggerFactory.getLogger(LogFileAnalyzer.class);
 
+
+
     public List<String> getTimeFrameList(InputStream inputStream) {
         String pattern = DATE_REGEX +"\\s" + TIME_REGEX + "\\s" + TIME_ZONE_REGEX + "\\s\\|\\s" + LOG_LEVEL_REGEX + "\\s+\\|\\s" + LOG_TYPE_REGEX;
         List<String> timeFrame = new ArrayList<>();
@@ -103,7 +105,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
     }
 
     public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
-        try (FileWriter writer = new FileWriter(filename);
+        try (FileWriter writer = new FileWriter(filename + ".txt");
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));

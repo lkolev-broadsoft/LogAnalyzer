@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZIPedLogsFactory implements ZIPFactory {
+public class ZIPedLogsFactory implements Openable {
 
     protected InputStream inputStream;
 
@@ -44,7 +44,7 @@ public class ZIPedLogsFactory implements ZIPFactory {
                 }
             }
         } catch (IOException e) {
-            logger.error("IOException while opening ZIP archive.",e);
+            LogFileAnalyzer.logger.error("IOException while opening ZIP archive.",e);
         }
     }
 

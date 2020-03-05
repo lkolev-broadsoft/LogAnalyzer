@@ -12,6 +12,6 @@ public class LogAnalyzer {
     public LogAnalyzer(String inputArchiveFilePath){
         this.inputArchiveFilePath = inputArchiveFilePath;
         this.archivePath = Paths.get(inputArchiveFilePath);
-        ArchiveFactory.determineArchiveType(inputArchiveFilePath);
+        Openable.determineArchiveType(inputArchiveFilePath);
     }
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TARGZedLogsFactory implements TARGZFactory {
+public class TARGZedLogsFactory implements Openable {
 
     protected List<String> listOfFiles = new ArrayList<>();
 
@@ -32,23 +32,33 @@ public class TARGZedLogsFactory implements TARGZFactory {
         try (FileInputStream fileInputStream = new FileInputStream(inputArchiveFilePath);
              GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(fileInputStream);
              TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream)) {
-            int filecount = 0;
+            int fileCount = 0;
             TarArchiveEntry currentEntry;
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
                 if(!currentEntry.isDirectory()){
-                    String logFileName = currentEntry.getName();
-                    listOfFiles.add(logFileName);
+                    String logFileName = getListOfFiles(currentEntry); //Refactored
                     //Code for extraction
-                    LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-                    Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream, logFileName);
-                    //logFileAnalyzer.writeToOutputTxtFile("result" + listOfFiles.get(filecount), results);
-                    logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))),results);
+                    analyzeLogFile(tarArchiveInputStream, fileCount, logFileName);
                     //Code for extraction
-                    filecount++;
+                    fileCount++;
                 }
             }
         } catch (IOException e) {
-            logger.error("IOException while opening TAR archive.",e);
+            LogFileAnalyzer.logger.error("IOException while opening TAR archive.",e);
+
+            //Every class should have separate logger.
         }
+    }
+
+    private void analyzeLogFile(TarArchiveInputStream tarArchiveInputStream, int fileCount, String logFileName) {
+        LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
+        Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream, logFileName);
+        logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results);
+    }
+
+    private String getListOfFiles(TarArchiveEntry currentEntry) {
+        String logFileName = currentEntry.getName();
+        listOfFiles.add(logFileName);
+        return logFileName;
     }
 }

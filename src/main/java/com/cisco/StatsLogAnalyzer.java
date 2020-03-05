@@ -201,7 +201,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     }
 
     public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
-        try (FileWriter writer = new FileWriter(filename);
+        try (FileWriter writer = new FileWriter(filename + ".txt");
              BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                 bufferedWriter.write((entry.getKey() + " - " + entry.getValue() + "\n"));
@@ -211,19 +211,33 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
-    public void writeToOutputTxtFile(String filename, ArrayList<StatisticData> inputArrayList){
+    /**
+     * 2020-02-03 14:12:22 243453(value) !ifvalue exceeds the value limit)boolean flag
+     *
+     *
+     * @param filename
+     * @param inputArrayList
+     */
+
+    public void writeToOutputTxtFile(String filename, List<StatisticData> inputArrayList){
         try (FileWriter writer = new FileWriter(filename);
              BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
             for(StatisticData statisticData : inputArrayList) {
-                bufferedWriter.write((statisticData.toString() + "\n"));
+                bufferedWriter.write((statisticData + "\n"));
             }
         } catch (IOException e) {
             logger.error("IOException while writing to Output text file.", e);
         }
     }
 
+    //Something wrong with the builder(fix later)
+//    protected StatisticData createStatisticDataObject(Map inputMap, LocalDateTime time){
+//        return new StatisticDataBuilder().setTime(time).setServerStatistic("c2s/Last hour packets").setValue((Long)inputMap.get("c2s/Last hour packets")).createStatisticData();
+//    }
+
     protected StatisticData createStatisticDataObject(SortedMap inputMap, LocalDateTime time){
-        return new StatisticDataBuilder().setTime(time).setServerStatistic("c2s/Last hour packets").setValue((Long) inputMap.get("c2s/Last hour packets")).createStatisticData();
+        StatisticData statisticData = new StatisticData(time,"c2s/Last hour packets", (Long) inputMap.get("c2s/Last hour packets"));
+        return statisticData;
     }
 
 
@@ -234,9 +248,10 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         getOverflows(statsList);
         getSessManProcessor(statsList);
         getCPUusage(statsList);
-        SortedMap<String,Long> testMap = getOverflowsAsMap(statsList);
+        SortedMap<String,Long> testMap = getLastPacketsAsMap(statsList);
         statisticData = createStatisticDataObject(testMap,extractLocalDateTimeFromFilename(logFileName));
-        statisticDataArrayList.add(statisticData);
+        //statisticDataArrayList.add(statisticData);
+        System.out.println(statisticData);
         return statValuesMap;
     }
 

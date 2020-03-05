@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DirectoryFactory implements ArchiveFactory {
+public class DirectoryFactory implements Openable {
 
     protected List<String> listOfFiles = new ArrayList<>();
 
@@ -39,7 +39,7 @@ public class DirectoryFactory implements ArchiveFactory {
                 filecount++;
             }
         } catch (IOException e) {
-            logger.error("IOException while opening directory.",e);
+            LogFileAnalyzer.logger.error("IOException while opening directory.",e);
         }
 
     }
