@@ -93,7 +93,10 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
                  BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
                 for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                    bufferedWriter.write((entry.getKey() + "  " + entry.getValue()+ "\n"));
+                    String key = entry.getKey();
+                    StatisticData statisticDataObject = (StatisticData) entry.getValue();
+                    Long value = statisticDataObject.getValue();
+                    bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
                 }
             } catch (IOException e) {
                 logger.error("IOException while writing to Output text file.", e);

@@ -57,14 +57,22 @@ public class StatisticData {
         this.normalValue = normalValue;
     }
 
-//    @Override
+    @Override
+    public String toString() {
+        return "StatisticData{" +
+                "time=" + time +
+                ", serverStatisticName='" + serverStatisticName + '\'' +
+                ", value=" + value +
+                ", normalValue=" + normalValue +
+                '}';
+    }
+
+//    //Temporary change toString method to print pretty
+//        @Override
 //    public String toString() {
-//        return "StatisticData{" +
-//                "time=" + time +
-//                ", serverStatisticName='" + serverStatisticName + '\'' +
-//                ", value=" + value +
-//                ", normalValue=" + normalValue +
-//                '}';
+//        return  "time=" + time +
+//                ", value=" + value;
 //    }
+
 
 }
