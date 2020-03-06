@@ -38,7 +38,7 @@ public class TARGZedLogsFactory implements Openable {
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
                 if(!currentEntry.isDirectory()){
                     String logFileName = getListOfFiles(currentEntry); //Refactored
-                    isLastFile = (tarArchiveInputStream.getNextTarEntry() == null); //Check if it is the last file in the archive
+                    //isLastFile = (tarArchiveInputStream.getNextTarEntry() == null); //Check if it is the last file in the archive
                     //Code for extraction
                     analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, isLastFile);
                     //Code for extraction
@@ -52,7 +52,7 @@ public class TARGZedLogsFactory implements Openable {
         }
     }
 
-    private void analyzeLogFile(TarArchiveInputStream tarArchiveInputStream, int fileCount, String logFileName, Boolean isLastFileInArchive) {
+    private void analyzeLogFile(TarArchiveInputStream tarArchiveInputStream, int fileCount, String logFileName, boolean isLastFileInArchive) {
         LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
         Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream, logFileName);
         logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results, isLastFileInArchive);

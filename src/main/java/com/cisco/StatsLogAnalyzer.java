@@ -88,24 +88,39 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //        }
 //    }
 
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFileInArchive){
-        if(isLastFileInArchive){
-            try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
-                 BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-                for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                    String key = entry.getKey();
-                    StatisticData statisticDataObject = (StatisticData) entry.getValue();
-                    Long value = statisticDataObject.getValue();
-                    bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
-                }
-            } catch (IOException e) {
-                logger.error("IOException while writing to Output text file.", e);
-            }
-        }
-        else{
-            statisticDataArrayList.add(statisticData);
-        }
+//    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFileInArchive){
+//        if(isLastFileInArchive){
+//            try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
+//                 BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+//                for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+//                    String key = entry.getKey();
+//                    StatisticData statisticDataObject = (StatisticData) entry.getValue();
+//                    Long value = statisticDataObject.getValue();
+//                    bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
+//                }
+//            } catch (IOException e) {
+//                logger.error("IOException while writing to Output text file.", e);
+//            }
+//        }
+//        else{
+//            //statisticDataArrayList.add(statisticData);
+//            System.out.println("NotLastFile");
+//        }
+//
+//    }
 
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFileInArchive){
+        try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
+             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                String key = entry.getKey();
+                StatisticData statisticDataObject = (StatisticData) entry.getValue();
+                Long value = statisticDataObject.getValue();
+                bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
+            }
+        } catch (IOException e) {
+            logger.error("IOException while writing to Output text file.", e);
+        }
     }
 
     protected Map<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){
@@ -270,16 +285,16 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     protected Map<String, Object> analyzeLog(InputStream inputStream, String logFileName){
         List<String> statsList = getStatsValues(inputStream);
         getLastPackets(statsList);
-        getOverflows(statsList);
-        getSessManProcessor(statsList);
-        getCPUusage(statsList);
+        //getOverflows(statsList);
+        //getSessManProcessor(statsList);
+        //getCPUusage(statsList);
         SortedMap<String,Long> testMap = getLastPacketsAsMap(statsList);
-        Map<String, Object> r = createResultsMapFromStatisticDataObject(statisticDataArrayList);
         statisticData = createStatisticDataObject(testMap,extractLocalDateTimeFromFilename(logFileName));
-        //statisticDataArrayList.add(statisticData);
-        //System.out.println(statisticData);
+        statisticDataArrayList.add(statisticData);
+        Map<String, Object> resultsMapFromStatisticDataObject = createResultsMapFromStatisticDataObject(statisticDataArrayList);
+        System.out.println(statisticDataArrayList);
 //        return statValuesMap;
-        return r;
+        return resultsMapFromStatisticDataObject;
     }
     
 }
