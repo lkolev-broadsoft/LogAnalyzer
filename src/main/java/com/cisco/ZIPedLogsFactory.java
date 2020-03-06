@@ -18,8 +18,6 @@ public class ZIPedLogsFactory implements Openable {
 
     protected Enumeration<? extends ZipEntry> entries;
 
-    protected boolean isLastFile;
-
     OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
     public ZIPedLogsFactory(String inputArchivePath) {
@@ -31,21 +29,19 @@ public class ZIPedLogsFactory implements Openable {
         try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
             int fileCount = 0;
             entries = zipFile.entries();
-            isLastFile = entries.hasMoreElements();
             while(entries.hasMoreElements()){
                 ZipEntry entry = entries.nextElement();
                 if(!entry.isDirectory()){
                     String logFileName = entry.getName();
                     ZipEntry zipEntry = zipFile.getEntry(logFileName);
                     listOfFiles.add(logFileName);
-                    isLastFile = !(entries.hasMoreElements());
                     inputStream = zipFile.getInputStream(zipEntry);
                     //Code for extraction
 //                    LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
 //                    Map<String, Object> results = logFileAnalyzer.analyzeLog(inputStream, logFileName);
 //                    logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results, isLastFile);
                     //Code for extraction
-                    analyzeLogFile(inputStream,fileCount,logFileName,isLastFile);
+                    analyzeLogFile(inputStream,fileCount,logFileName);
                     fileCount++;
                 }
             }
@@ -54,10 +50,10 @@ public class ZIPedLogsFactory implements Openable {
         }
     }
 
-    private void analyzeLogFile(InputStream InputStream, int fileCount, String logFileName, boolean isLastFileInArchive) {
+    private void analyzeLogFile(InputStream InputStream, int fileCount, String logFileName) {
         LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
         Map<String, Object> results = logFileAnalyzer.analyzeLog(InputStream, logFileName);
-        logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results, isLastFileInArchive);
+        logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results);
         //Add logic in StatsLogAnalyzer, analyzeLog method to check if it is the last file in the archive or in the directory and write the accumulated statistics to file.
     }
 

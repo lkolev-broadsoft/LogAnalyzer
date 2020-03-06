@@ -109,7 +109,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //
 //    }
 
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFileInArchive){
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
         try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
              BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {

@@ -60,6 +60,18 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         return new TreeMap<>(inputMap); //Added the resulting map to treemap
     }
 
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
+        try (FileWriter writer = new FileWriter(filename + ".txt");
+             BufferedWriter bw = new BufferedWriter(writer)) {
+            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
+            }
+        } catch (IOException e) {
+
+            logger.error("IOException: %s%n", e);
+        }
+    }
+
     protected List<String> getTimeFrame(SortedMap<String, Long> sortedMap){
         String startTime = sortedMap.firstKey();   // Get String with the starting time
         String endTime = sortedMap.lastKey();        // Get String with the ending time
@@ -102,18 +114,6 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
             }
         }
         return sortedMap;
-    }
-
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFile){
-        try (FileWriter writer = new FileWriter(filename + ".txt");
-             BufferedWriter bw = new BufferedWriter(writer)) {
-            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
-            }
-        } catch (IOException e) {
-
-            logger.error("IOException: %s%n", e);
-        }
     }
 
     protected List<String> getFileNames(List<String> listOfEntries) {
