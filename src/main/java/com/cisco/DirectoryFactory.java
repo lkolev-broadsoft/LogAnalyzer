@@ -16,6 +16,8 @@ public class DirectoryFactory implements Openable {
 
     protected FileInputStream fileInputStream;
 
+    protected boolean isLastFile;
+
     OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
     public DirectoryFactory(String inputPath) {
@@ -34,7 +36,7 @@ public class DirectoryFactory implements Openable {
                 //code for extraction
                 LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
                 Map<String, Object> results = logFileAnalyzer.analyzeLog(fileInputStream,logFileName);
-                logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))), results);
+                logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))), results, isLastFile); //Hardcoded remove false  later and fix. Add logic to check it..
                 //code for extraction
                 filecount++;
             }

@@ -73,11 +73,47 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected StatisticData statisticData;
 
-
     public StatsLogAnalyzer(){
         this.logType = "stats";
     }
-    
+
+//    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
+//        try (FileWriter writer = new FileWriter(filename + ".txt");
+//             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+//            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+//                bufferedWriter.write((entry.getKey() + " - " + entry.getValue() + "\n"));
+//            }
+//        } catch (IOException e) {
+//            logger.error("IOException while writing to Output text file.", e);
+//        }
+//    }
+
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFileInArchive){
+        if(isLastFileInArchive){
+            try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
+                 BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                    bufferedWriter.write((entry.getKey() + "  " + entry.getValue()+ "\n"));
+                }
+            } catch (IOException e) {
+                logger.error("IOException while writing to Output text file.", e);
+            }
+        }
+        else{
+            statisticDataArrayList.add(statisticData);
+        }
+
+    }
+
+    protected Map<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){
+        SortedMap<String, Object> resultsMap = new TreeMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        for(StatisticData statisticData : statisticDataList){
+            resultsMap.put(statisticData.getTime().format(formatter),statisticData);
+        }
+        return resultsMap;
+    }
+
     protected List<String> getStatsValues(InputStream inputStream){
         List<String> statValues = new ArrayList<>();
         try {
@@ -200,59 +236,47 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         return filenames;
     }
 
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
-        try (FileWriter writer = new FileWriter(filename + ".txt");
-             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                bufferedWriter.write((entry.getKey() + " - " + entry.getValue() + "\n"));
-            }
-        } catch (IOException e) {
-            logger.error("IOException while writing to Output text file.", e);
-        }
-    }
 
     /**
      * 2020-02-03 14:12:22 243453(value) !ifvalue exceeds the value limit)boolean flag
-     *
-     *
-     * @param filename
-     * @param inputArrayList
      */
 
-    public void writeToOutputTxtFile(String filename, List<StatisticData> inputArrayList){
-        try (FileWriter writer = new FileWriter(filename);
-             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-            for(StatisticData statisticData : inputArrayList) {
-                bufferedWriter.write((statisticData + "\n"));
-            }
-        } catch (IOException e) {
-            logger.error("IOException while writing to Output text file.", e);
-        }
-    }
+//    public void writeToOutputTxtFile(String filename, List<StatisticData> inputArrayList){
+//        try (FileWriter writer = new FileWriter(filename);
+//             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+//            for(StatisticData statisticData : inputArrayList) {
+//                bufferedWriter.write((statisticData + "\n"));
+//            }
+//        } catch (IOException e) {
+//            logger.error("IOException while writing to Output text file.", e);
+//        }
+//    }
 
     //Something wrong with the builder(fix later)
 //    protected StatisticData createStatisticDataObject(Map inputMap, LocalDateTime time){
 //        return new StatisticDataBuilder().setTime(time).setServerStatistic("c2s/Last hour packets").setValue((Long)inputMap.get("c2s/Last hour packets")).createStatisticData();
 //    }
 
-    protected StatisticData createStatisticDataObject(SortedMap inputMap, LocalDateTime time){
-        StatisticData statisticData = new StatisticData(time,"c2s/Last hour packets", (Long) inputMap.get("c2s/Last hour packets"));
-        return statisticData;
+    protected StatisticData createStatisticDataObject(Map inputMap, LocalDateTime time){
+        StatisticData statisticDataObject = new StatisticData(time,"c2s/Last hour packets", (Long) inputMap.get("c2s/Last hour packets"));
+        return statisticDataObject;
     }
 
 
-
-    protected Map<String, String> analyzeLog(InputStream inputStream, String logFileName){
+    @Override
+    protected Map<String, Object> analyzeLog(InputStream inputStream, String logFileName){
         List<String> statsList = getStatsValues(inputStream);
         getLastPackets(statsList);
         getOverflows(statsList);
         getSessManProcessor(statsList);
         getCPUusage(statsList);
         SortedMap<String,Long> testMap = getLastPacketsAsMap(statsList);
+        Map<String, Object> r = createResultsMapFromStatisticDataObject(statisticDataArrayList);
         statisticData = createStatisticDataObject(testMap,extractLocalDateTimeFromFilename(logFileName));
         //statisticDataArrayList.add(statisticData);
-        System.out.println(statisticData);
-        return statValuesMap;
+        //System.out.println(statisticData);
+//        return statValuesMap;
+        return r;
     }
-
+    
 }

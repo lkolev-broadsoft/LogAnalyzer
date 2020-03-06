@@ -104,7 +104,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         return sortedMap;
     }
 
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, Boolean isLastFile){
         try (FileWriter writer = new FileWriter(filename + ".txt");
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
