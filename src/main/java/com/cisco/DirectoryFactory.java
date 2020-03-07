@@ -8,17 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class DirectoryFactory implements Openable {
+public class DirectoryFactory extends ArchiveFactory implements Openable {
 
     protected List<String> listOfFiles = new ArrayList<>();
 
     protected FileInputStream fileInputStream;
-
-    protected boolean isLastFile;
-
-    OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
     public DirectoryFactory(String inputPath) {
         open(inputPath);
@@ -33,16 +28,11 @@ public class DirectoryFactory implements Openable {
                 String logFileName = String.valueOf(path.getFileName());
                 listOfFiles.add(logFileName);
                 fileInputStream = new FileInputStream(path.toFile());
-                //code for extraction
-                LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-                Map<String, Object> results = logFileAnalyzer.analyzeLog(fileInputStream,logFileName);
-                logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(filecount))), results); //Hardcoded remove false  later and fix. Add logic to check it..
-                //code for extraction
+                analyzeLogFile(fileInputStream ,filecount, logFileName, listOfFiles);
                 filecount++;
             }
         } catch (IOException e) {
             LogFileAnalyzer.logger.error("IOException while opening directory.",e);
         }
-
     }
 }

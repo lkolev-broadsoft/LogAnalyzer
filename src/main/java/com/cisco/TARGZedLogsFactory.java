@@ -3,20 +3,16 @@ package com.cisco;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
 
     protected List<String> listOfFiles = new ArrayList<>();
-
-    OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
 
     public TARGZedLogsFactory(String inputArchivePath) {
         open(inputArchivePath);
@@ -37,9 +33,7 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
                 if(!currentEntry.isDirectory()){
                     String logFileName = getListOfFiles(currentEntry); //Refactored
-                    //Code for extraction
                     analyzeLogFile(tarArchiveInputStream, fileCount, logFileName,listOfFiles);
-                    //Code for extraction
                     fileCount++;
                 }
             }
@@ -49,13 +43,6 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
             //Every class should have separate logger.
         }
     }
-
-//    private void analyzeLogFile(TarArchiveInputStream tarArchiveInputStream, int fileCount, String logFileName) {
-//        LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-//        Map<String, Object> results = logFileAnalyzer.analyzeLog(tarArchiveInputStream, logFileName);
-//        logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results);
-//        //Add logic in StatsLogAnalyzer, analyzeLog method to check if it is the last file in the archive or in the directory and write the accumulated statistics to file.
-//    }
 
     private String getListOfFiles(TarArchiveEntry currentEntry) {
         String logFileName = currentEntry.getName();
