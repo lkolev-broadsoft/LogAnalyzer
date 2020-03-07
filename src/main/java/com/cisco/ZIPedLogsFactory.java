@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZIPedLogsFactory implements Openable {
+public class ZIPedLogsFactory extends ArchiveFactory implements Openable {
 
     protected InputStream inputStream;
 
@@ -41,7 +41,7 @@ public class ZIPedLogsFactory implements Openable {
 //                    Map<String, Object> results = logFileAnalyzer.analyzeLog(inputStream, logFileName);
 //                    logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results, isLastFile);
                     //Code for extraction
-                    analyzeLogFile(inputStream,fileCount,logFileName);
+                    analyzeLogFile(inputStream,fileCount,logFileName, listOfFiles);
                     fileCount++;
                 }
             }
@@ -49,13 +49,13 @@ public class ZIPedLogsFactory implements Openable {
             LogFileAnalyzer.logger.error("IOException while opening ZIP archive.",e);
         }
     }
-
-    private void analyzeLogFile(InputStream InputStream, int fileCount, String logFileName) {
-        LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
-        Map<String, Object> results = logFileAnalyzer.analyzeLog(InputStream, logFileName);
-        logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results);
-        //Add logic in StatsLogAnalyzer, analyzeLog method to check if it is the last file in the archive or in the directory and write the accumulated statistics to file.
-    }
+//
+//    private void analyzeLogFile(InputStream InputStream, int fileCount, String logFileName) {
+//        LogFileAnalyzer logFileAnalyzer = logFileFactory.getLogFileAnalyzer(logFileName);
+//        Map<String, Object> results = logFileAnalyzer.analyzeLog(InputStream, logFileName);
+//        logFileAnalyzer.writeToOutputTxtFile(("result" + (logFileAnalyzer.getFileNames(listOfFiles).get(fileCount))),results);
+//        //Add logic in StatsLogAnalyzer, analyzeLog method to check if it is the last file in the archive or in the directory and write the accumulated statistics to file.
+//    }
 
 
 
