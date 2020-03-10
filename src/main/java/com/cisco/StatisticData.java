@@ -66,13 +66,4 @@ public class StatisticData {
                 ", normalValue=" + normalValue +
                 '}';
     }
-
-//    //Temporary change toString method to print pretty
-//        @Override
-//    public String toString() {
-//        return  "time=" + time +
-//                ", value=" + value;
-//    }
-
-
 }
