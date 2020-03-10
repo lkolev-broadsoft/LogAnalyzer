@@ -69,7 +69,9 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected static ArrayList<StatisticData> statisticDataArrayList = new ArrayList<>();
 
-    private static Set<String> serverStatisticsNames = new HashSet<String>();
+    private static Set<String> serverStatisticsNames = new HashSet<>();
+
+    private static final String SERVICE_NAME_STRING = "serviceName";
 
     public StatsLogAnalyzer(){
         this.logType = "stats";
@@ -122,7 +124,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statValuesMap.put(m.group("serviceName") + "/" + m.group("lastPackets") ,(m.group("packets")));
+                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(m.group("packets")));
             }
         }
     }
@@ -136,7 +138,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                results.put(m.group("serviceName") + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
+                results.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
             }
         }
         return results;
@@ -148,7 +150,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.matches()){
-                statValuesMap.put(m.group("serviceName") + "/" + m.group("overflowType") + " overflow" ,(m.group("packets")));
+                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(m.group("packets")));
             }
         }
     }
@@ -160,7 +162,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.matches()){
-                results.put(m.group("serviceName") + "/" + m.group("overflowType") + " overflow" ,(Long.valueOf(m.group("packets"))));
+                results.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(Long.valueOf(m.group("packets"))));
             }
         }
         return results;
@@ -172,7 +174,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statValuesMap.put(m.group("serviceName") + m.group(2) + " " + (m.group(3)), m.group(4));
+                statValuesMap.put(m.group(SERVICE_NAME_STRING) + m.group(2) + " " + (m.group(3)), m.group(4));
             }
         }
     }
@@ -183,7 +185,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statValuesMap.put(m.group("serviceName") + "/" + m.group("usageType"), m.group(4));
+                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("usageType"), m.group(4));
             }
         }
     }
@@ -199,7 +201,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statisticsMap.put(m.group("serviceName") + "/" + m.group("usageType"),(Long.valueOf(m.group("percentage"))));
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("usageType"),(Long.valueOf(m.group("percentage"))));
             }
         }
     }
@@ -210,7 +212,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statisticsMap.put(m.group("serviceName") + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
             }
         }
     }
@@ -231,6 +233,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         return localDateTime;
     }
 
+    @Override
     protected List<String> getFileNames(List<String> listOfEntries) {
         List<String> filenames = new ArrayList<>();
         String pattern = logType + "_" + STATS_DATE_REGEX + "_" + STATS_TIME_REGEX;
