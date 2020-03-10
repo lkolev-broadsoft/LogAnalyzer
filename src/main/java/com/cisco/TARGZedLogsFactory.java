@@ -28,6 +28,7 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
         try (FileInputStream fileInputStream = new FileInputStream(inputArchiveFilePath);
              GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(fileInputStream);
              TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream)) {
+//            checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath);
             int fileCount = 0;
             TarArchiveEntry currentEntry;
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
@@ -49,4 +50,12 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
         listOfFiles.add(logFileName);
         return logFileName;
     }
+
+//    private void checkForNestedArchives(TarArchiveInputStream inputStream, String inputFilePath) throws IOException {
+//        String fileName = inputStream.getNextEntry().getName();
+//        if(fileName.contains(".tar.gz")){
+//           open(inputFilePath + "\\" + fileName);
+//        }
+//    }
+
 }

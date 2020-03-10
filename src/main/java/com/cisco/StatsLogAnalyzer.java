@@ -65,13 +65,20 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected SortedMap<String, String> statValuesMap = new TreeMap<>();
 
-    //protected SortedMap<String, String> results = new TreeMap<>();
+    protected SortedMap<String, Object> c2sLastHourPacketsMap = new TreeMap<>();
+    protected SortedMap<String, String> s2sLastHourPacketsMap = new TreeMap<>();
+    protected SortedMap<String, String> messageRouterLastHourPacketsMap = new TreeMap<>();
+    protected SortedMap<String, String> sessManLastHourPacketsMap = new TreeMap<>();
+    protected SortedMap<String, String> cpuUsageMap = new TreeMap<>();
+    protected SortedMap<String, String> heapUsageMap = new TreeMap<>();
 
-//    protected StatisticData[] statisticDataArray;
+    protected static Map<String, Long> statisticsMap = new HashMap<>();
 
     protected static ArrayList<StatisticData> statisticDataArrayList = new ArrayList<>();
 
     protected StatisticData statisticData;
+
+    private static Set<String> serverStatisticsNames = new HashSet<String>();
 
     public StatsLogAnalyzer(){
         this.logType = "stats";
@@ -110,24 +117,39 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //    }
 
     public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
-        try (FileWriter writer = new FileWriter( "c2sLastHourPackets" + ".txt");
-             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-            for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                String key = entry.getKey();
-                StatisticData statisticDataObject = (StatisticData) entry.getValue();
-                Long value = statisticDataObject.getValue();
-                bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
+//        Iterator<String> iterator = serverStatisticsNames.iterator();
+//        while (iterator.hasNext()) {
+        for(String serverStatisticName : serverStatisticsNames){
+            try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
+                 BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                    StatisticData statisticDataObject = (StatisticData) entry.getValue();
+                    if(serverStatisticName.contains(statisticDataObject.getServerStatisticName())){
+                        Long value = statisticDataObject.getValue();
+                        bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
+                    }
+                }
+            } catch (IOException e) {
+                logger.error("IOException while writing to Output text file.", e);
             }
-        } catch (IOException e) {
-            logger.error("IOException while writing to Output text file.", e);
         }
     }
 
-    protected Map<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){
+//    protected Map<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){
+//        SortedMap<String, Object> resultsMap = new TreeMap<>();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        for(StatisticData statisticData : statisticDataList){
+//            resultsMap.put(statisticData.getTime().format(formatter),statisticData);
+//        }
+//        return resultsMap;
+//    }
+
+    //Adding Statistic name to Map's key in order to differentiate
+    protected SortedMap<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){
         SortedMap<String, Object> resultsMap = new TreeMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for(StatisticData statisticData : statisticDataList){
-            resultsMap.put(statisticData.getTime().format(formatter),statisticData);
+            resultsMap.put(statisticData.getTime().format(formatter) + " " + statisticData.getServerStatisticName(),statisticData);
         }
         return resultsMap;
     }
@@ -218,6 +240,33 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
+    protected void getStatisticsFromList(List<String> inputList){
+        getLastHourPackets(inputList);
+        getCPUandMemory(inputList);
+    }
+
+    private void getCPUandMemory(List<String> inputList) {
+        String pattern = SERVICE + "/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage \\[\\%\\])\\s+(?<percentage>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group("serviceName") + "/" + m.group("usageType"),(Long.valueOf(m.group("percentage"))));
+            }
+        }
+    }
+
+    private void getLastHourPackets(List<String> inputList) {
+        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group("serviceName") + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
+            }
+        }
+    }
+
     //Extract LocalDateTime from fileName (One responsibility, only)
 
     protected LocalDateTime extractLocalDateTimeFromFilename(String fileName){
@@ -280,21 +329,50 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         return statisticDataObject;
     }
 
+    protected void createStatisticDataObjectList(Map<String, Long> inputMap, LocalDateTime time){
+        for (Map.Entry<String, Long> entry : inputMap.entrySet()) {
+            StatisticData statisticDataObject = new StatisticData(time, entry.getKey(),entry.getValue());
+            statisticDataArrayList.add(statisticDataObject);
+        }
+    }
+
 
     @Override
     protected Map<String, Object> analyzeLog(InputStream inputStream, String logFileName){
         List<String> statsList = getStatsValues(inputStream);
-        getLastPackets(statsList);
+        //getLastPackets(statsList);
         //getOverflows(statsList);
         //getSessManProcessor(statsList);
         //getCPUusage(statsList);
-        SortedMap<String,Long> testMap = getLastPacketsAsMap(statsList);
-        statisticData = createStatisticDataObject(testMap,extractLocalDateTimeFromFilename(logFileName));
-        statisticDataArrayList.add(statisticData);
-        Map<String, Object> resultsMapFromStatisticDataObject = createResultsMapFromStatisticDataObject(statisticDataArrayList);
-        System.out.println(statisticDataArrayList);
-//        return statValuesMap;
-        return resultsMapFromStatisticDataObject;
+//        SortedMap<String,Long> testMap = getLastPacketsAsMap(statsList);
+//        statisticData = createStatisticDataObject(testMap,extractLocalDateTimeFromFilename(logFileName));
+//        statisticDataArrayList.add(statisticData);
+//        return createResultsMapFromStatisticDataObject(statisticDataArrayList);
+        //return statValuesMap;
+        getStatisticsFromList(statsList);
+        createStatisticDataObjectList(statisticsMap, extractLocalDateTimeFromFilename(logFileName));
+//        outputFileName = prepareResultsForWriting(statisticDataArrayList);
+        SortedMap<String,Object > testmap = createResultsMapFromStatisticDataObject(statisticDataArrayList);
+        getServerStatisticsNames(statisticDataArrayList);
+        return testmap;
     }
-    
+
+//    private String prepareResultsForWriting(List<StatisticData> statisticDataObjectList){
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String serverStatisticName = "c2s/Last hour packets";
+//        for(StatisticData statisticData : statisticDataObjectList){
+//            if(statisticData.getServerStatisticName().equals(serverStatisticName)){
+//                c2sLastHourPacketsMap.put(statisticData.getTime().format(formatter) + " " + statisticData.getServerStatisticName(),statisticData);
+//            }
+//        }
+//        return serverStatisticName;
+//
+//    }
+
+    private void getServerStatisticsNames(List<StatisticData> statisticDataObjectsList){
+        for(StatisticData statisticData: statisticDataObjectsList){
+            serverStatisticsNames.add(statisticData.getServerStatisticName());
+        }
+    }
+
 }
