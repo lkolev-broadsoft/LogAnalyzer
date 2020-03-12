@@ -196,6 +196,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         getTotalOverflows(inputList);
         getSessManRegisteredAccounts(inputList);
         getSessManConnections(inputList);
+        getSessManSessions(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -264,6 +265,17 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             Matcher m = r.matcher(line);
             if(m.find()){
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("connections"),(Long.valueOf(m.group("packets"))));
+            }
+        }
+    }
+
+    private void getSessManSessions(List<String> inputList){
+        String pattern = SERVICE + "/(?<sessions>((\\bOpen\\b|\\bMaximum\\b|\\bTotal\\b) user sessions))\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("sessions"),(Long.valueOf(m.group("packets"))));
             }
         }
     }
