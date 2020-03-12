@@ -193,6 +193,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     protected void getStatisticsFromList(List<String> inputList){
         getLastHourPackets(inputList);
         getCPUandMemory(inputList);
+//        getServiceComponentsTotalOverflows(inputList);
         getTotalOverflows(inputList);
     }
 
@@ -218,7 +219,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
-    private void getTotalOverflows(List<String> inputList){
+    private void getServiceComponentsTotalOverflows(List<String> inputList){
         String pattern = SERVICE + "/((?<overflowType>\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
@@ -227,9 +228,22 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(Long.valueOf(m.group("packets"))));
             }
         }
-
     }
 
+    private void getTotalOverflows(List<String> inputList){
+        String pattern = "((total/\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.matches()){
+                Long totalOverflowValue = (Long.valueOf(m.group("packets")));
+                statisticsMap.put(m.group(1),totalOverflowValue);
+                if(totalOverflowValue > 0){
+                    getServiceComponentsTotalOverflows(inputList);
+                }
+            }
+        }
+    }
     //Extract LocalDateTime from fileName (One responsibility, only)
 
     protected LocalDateTime extractLocalDateTimeFromFilename(String fileName){
