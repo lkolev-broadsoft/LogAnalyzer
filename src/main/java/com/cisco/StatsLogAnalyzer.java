@@ -118,55 +118,55 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         return statValues;
     }
 
-    protected void getLastPackets(List<String> inputList){
-        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
-        Pattern r = Pattern.compile(pattern);
-        for(String line : inputList){
-            Matcher m = r.matcher(line);
-            if(m.find()){
-                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(m.group("packets")));
-            }
-        }
-    }
+//    protected void getLastPackets(List<String> inputList){
+//        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+//        Pattern r = Pattern.compile(pattern);
+//        for(String line : inputList){
+//            Matcher m = r.matcher(line);
+//            if(m.find()){
+//                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(m.group("packets")));
+//            }
+//        }
+//    }
 
-    // Use to add statisticName and value to a StatisticData object
+//    // Use to add statisticName and value to a StatisticData object
+//
+//    protected SortedMap<String,Long> getLastPacketsAsMap(List<String> inputList){
+//        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
+//        Pattern r = Pattern.compile(pattern);
+//        SortedMap<String,Long> results = new TreeMap<>();
+//        for(String line : inputList){
+//            Matcher m = r.matcher(line);
+//            if(m.find()){
+//                results.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
+//            }
+//        }
+//        return results;
+//    }
 
-    protected SortedMap<String,Long> getLastPacketsAsMap(List<String> inputList){
-        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bminute\\b|\\bsecond\\b|\\bhour\\b) packets)\\s+(?<packets>\\d+)";
-        Pattern r = Pattern.compile(pattern);
-        SortedMap<String,Long> results = new TreeMap<>();
-        for(String line : inputList){
-            Matcher m = r.matcher(line);
-            if(m.find()){
-                results.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
-            }
-        }
-        return results;
-    }
+//    protected void getOverflows(List<String> inputList){
+//        String pattern = SERVICE + "/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
+//        Pattern r = Pattern.compile(pattern);
+//        for(String line : inputList){
+//            Matcher m = r.matcher(line);
+//            if(m.matches()){
+//                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(m.group("packets")));
+//            }
+//        }
+//    }
 
-    protected void getOverflows(List<String> inputList){
-        String pattern = SERVICE + "/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
-        Pattern r = Pattern.compile(pattern);
-        for(String line : inputList){
-            Matcher m = r.matcher(line);
-            if(m.matches()){
-                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(m.group("packets")));
-            }
-        }
-    }
-
-    protected SortedMap<String,Long> getOverflowsAsMap(List<String> inputList){
-        String pattern = SERVICE + "/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
-        Pattern r = Pattern.compile(pattern);
-        SortedMap<String,Long> results = new TreeMap<>();
-        for(String line : inputList){
-            Matcher m = r.matcher(line);
-            if(m.matches()){
-                results.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(Long.valueOf(m.group("packets"))));
-            }
-        }
-        return results;
-    }
+//    protected SortedMap<String,Long> getOverflowsAsMap(List<String> inputList){
+//        String pattern = SERVICE + "/((?<overflowType>\\bSocket\\b|\\bIN Queue\\b|\\bOUT Queue\\b|\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
+//        Pattern r = Pattern.compile(pattern);
+//        SortedMap<String,Long> results = new TreeMap<>();
+//        for(String line : inputList){
+//            Matcher m = r.matcher(line);
+//            if(m.matches()){
+//                results.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(Long.valueOf(m.group("packets"))));
+//            }
+//        }
+//        return results;
+//    }
 
     protected void getSessManProcessor(List<String> inputList){
         String pattern = SERVICE + "(/Processor): (.*),(.*)";
@@ -193,8 +193,9 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     protected void getStatisticsFromList(List<String> inputList){
         getLastHourPackets(inputList);
         getCPUandMemory(inputList);
-//        getServiceComponentsTotalOverflows(inputList);
         getTotalOverflows(inputList);
+        getSessManRegisteredAccounts(inputList);
+        getSessManConnections(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -244,6 +245,29 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             }
         }
     }
+
+    private void getSessManRegisteredAccounts(List<String> inputList){
+        String pattern = SERVICE + "(/Registered accounts)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group(2),(Long.valueOf(m.group("packets"))));
+            }
+        }
+    }
+
+    private void getSessManConnections(List<String> inputList){
+        String pattern = SERVICE + "/(?<connections>((\\bOpen\\b|\\bMaximum\\b|\\bTotal\\b|\\bClosed\\b) user connections))\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("connections"),(Long.valueOf(m.group("packets"))));
+            }
+        }
+    }
+
     //Extract LocalDateTime from fileName (One responsibility, only)
 
     protected LocalDateTime extractLocalDateTimeFromFilename(String fileName){
