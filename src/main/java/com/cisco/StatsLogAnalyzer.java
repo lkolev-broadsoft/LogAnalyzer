@@ -57,7 +57,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected static final String SESS_MAN = "sess-man";
 
-    protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b)";
+    protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b|\\bbosh\\b|\\bcl-comp\\b|\\bext\\b)";
 
     protected static final String STATS_DATE_REGEX = "(?<year>20\\d\\d)-(?<month>0[1-9]|1[012])-(?<day>0[1-9]|[12][0-9]|3[01])";
 
@@ -193,10 +193,11 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     protected void getStatisticsFromList(List<String> inputList){
         getLastHourPackets(inputList);
         getCPUandMemory(inputList);
+        getTotalOverflows(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
-        String pattern = SERVICE + "/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage \\[\\%\\])\\s+(?<percentage>\\d+)";
+        String pattern = SERVICE + "/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage \\[%])\\s+(?<percentage>\\d+)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
@@ -215,6 +216,18 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") ,(Long.valueOf(m.group("packets"))));
             }
         }
+    }
+
+    private void getTotalOverflows(List<String> inputList){
+        String pattern = SERVICE + "/((?<overflowType>\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.matches()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" ,(Long.valueOf(m.group("packets"))));
+            }
+        }
+
     }
 
     //Extract LocalDateTime from fileName (One responsibility, only)
@@ -257,10 +270,10 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //        return new StatisticDataBuilder().setTime(time).setServerStatistic("c2s/Last hour packets").setValue((Long)inputMap.get("c2s/Last hour packets")).createStatisticData();
 //    }
 
-    protected StatisticData createStatisticDataObject(Map inputMap, LocalDateTime time){
-        StatisticData statisticDataObject = new StatisticData(time,"c2s/Last hour packets", (Long) inputMap.get("c2s/Last hour packets"));
-        return statisticDataObject;
-    }
+//    protected StatisticData createStatisticDataObject(Map inputMap, LocalDateTime time){
+//        StatisticData statisticDataObject = new StatisticData(time,"c2s/Last hour packets", (Long) inputMap.get("c2s/Last hour packets"));
+//        return statisticDataObject;
+//    }
 
     protected void createStatisticDataObjectList(Map<String, Long> inputMap, LocalDateTime time){
         for (Map.Entry<String, Long> entry : inputMap.entrySet()) {
