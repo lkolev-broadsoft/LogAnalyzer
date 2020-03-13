@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 
 public class StatisticData {
 
-    private LocalDateTime time;
-    private String serverStatisticName;
-    private Long value;
-    private Long normalValue;
+    protected LocalDateTime time;
+    protected String serverStatisticName;
+    protected Long value;
+    protected Long normalValue;
 
     public StatisticData(LocalDateTime time, String serverStatistic, Long value, Long normalValue){
     }
@@ -20,6 +20,11 @@ public class StatisticData {
         this.time = time;
         this.serverStatisticName = serverStatistic;
         this.value = value;
+    }
+
+    public StatisticData(LocalDateTime time, String serverStatistic) {
+        this.time = time;
+        this.serverStatisticName = serverStatistic;
     }
 
 
