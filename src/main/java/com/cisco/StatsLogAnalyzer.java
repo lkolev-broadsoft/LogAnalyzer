@@ -63,7 +63,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])[:|_|/](?<minute>[0-5][0-9])[:|_|/](?<second>[0-5][0-9])";
 
-    protected static final String SESSMAN_PROCESSOR_REGEX = "(/Processor): (?<parameter>[A-Za-z0-9//._:-]+)\\s+, (?<queue>Queue:) (?<queueValue>\\d+), (?<averageTime>AvTime: )(?<averageTimeValue>\\d+), (?<runs>Runs: )(?<runsValue>\\d+), (?<lost>Lost: )(?<lostValue>\\d+)";
+    protected static final String SESSMAN_PROCESSOR_REGEX = "(/Processor): (?<parameter>[A-Za-z0-9/._:-]+)\\s+, (?<queue>Queue:) (?<queueValue>\\d+), (?<averageTime>AvTime: )(?<averageTimeValue>\\d+), (?<runs>Runs: )(?<runsValue>\\d+), (?<lost>Lost: )(?<lostValue>\\d+)";
 
     protected SortedMap<String, String> statValuesMap = new TreeMap<>();
 
@@ -193,12 +193,13 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     }
 
     protected void getStatisticsFromList(List<String> inputList){
-        getLastHourPackets(inputList);
-        getCPUandMemory(inputList);
-        getTotalOverflows(inputList);
-        getSessManRegisteredAccounts(inputList);
-        getSessManConnections(inputList);
-        getSessManSessions(inputList);
+//        getLastHourPackets(inputList);
+//        getCPUandMemory(inputList);
+//        getTotalOverflows(inputList);
+//        getSessManRegisteredAccounts(inputList);
+//        getSessManConnections(inputList);
+//        getSessManSessions(inputList);
+        getSessManProcessor(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -282,18 +283,16 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
-//    private void getSessManProcessor(List<String> inputList){
-//        String pattern = SERVICE + SESSMAN_PROCESSOR_REGEX;
-//        Pattern r = Pattern.compile(pattern);
-//        for(String line : inputList){
-//            Matcher m = r.matcher(line);
-//            if(m.find()){
-//
-//                SessManStatisticData sessManStatisticData = new SessManStatisticData (m.group(SERVICE_NAME_STRING) + m.group(2) + " " + (m.group(3)), (Long.valueOf(m.group(4))));
-//                statisticDataArrayList.add(
-//            }
-//        }
-//    }
+    private void getSessManProcessor(List<String> inputList){
+        String pattern = SERVICE + SESSMAN_PROCESSOR_REGEX;
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("lostValue"));
+            }
+        }
+    }
 
     //Extract LocalDateTime from fileName (One responsibility, only)
 
