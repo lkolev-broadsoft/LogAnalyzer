@@ -63,7 +63,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])[:|_|/](?<minute>[0-5][0-9])[:|_|/](?<second>[0-5][0-9])";
 
-    protected static final String SESSMAN_PROCESSOR_REGEX = "(/Processor): (?<parameter>[A-Za-z0-9/._:-]+)\\s+, (?<queue>Queue:) (?<queueValue>\\d+), (?<averageTime>AvTime: )(?<averageTimeValue>\\d+), (?<runs>Runs: )(?<runsValue>\\d+), (?<lost>Lost: )(?<lostValue>\\d+)";
+    protected static final String SESSMAN_PROCESSOR_REGEX = "(/Processor): (?<parameter>[A-Za-z0-9/._:-]+)\\s+, (?<value>(?<queue>Queue:) (?<queueValue>\\d+), (?<averageTime>AvTime: )(?<averageTimeValue>\\d+), (?<runs>Runs: )(?<runsValue>\\d+), (?<lost>Lost: )(?<lostValue>\\d+))";
 
     protected SortedMap<String, String> statValuesMap = new TreeMap<>();
 
@@ -86,7 +86,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
                 for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                     StatisticData statisticDataObject = (StatisticData) entry.getValue();
                     if(serverStatisticName.contains(statisticDataObject.getServerStatisticName())){
-                        Long value = statisticDataObject.getValue();
+                        String value = statisticDataObject.getValue();
                         bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
                     }
                 }
@@ -289,7 +289,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("lostValue"));
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("value"));
             }
         }
     }
@@ -341,7 +341,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected void createStatisticDataObjectList(Map<String, String> inputMap, LocalDateTime time){
         for (Map.Entry<String, String> entry : inputMap.entrySet()) {
-            StatisticData statisticDataObject = new StatisticData(time, entry.getKey(),Long.parseLong(entry.getValue()));
+            StatisticData statisticDataObject = new StatisticData(time, entry.getKey(),entry.getValue());
             statisticDataArrayList.add(statisticDataObject);
         }
     }

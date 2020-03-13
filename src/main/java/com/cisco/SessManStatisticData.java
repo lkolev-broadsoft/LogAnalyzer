@@ -27,6 +27,11 @@ public class SessManStatisticData extends StatisticData {
         this.lost = lost;
     }
 
+    @Override
+    public String getValue() {
+        return super.getValue();
+    }
+
     public String getParameter() {
         return parameter;
     }
