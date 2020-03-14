@@ -79,13 +79,16 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         this.logType = "stats";
     }
 
+
+    //Don't write for every file, but once for the archive or the folder
+    //Need to check if it is the last entry(file and then write, before that store the data in StatisticDataArrayList
     public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
         for(String serverStatisticName : serverStatisticsNames){
             try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
                  BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
                 for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                     StatisticData statisticDataObject = (StatisticData) entry.getValue();
-                    if(serverStatisticName.contains(statisticDataObject.getServerStatisticName())){
+                    if(serverStatisticName.replace("_","/").matches(statisticDataObject.getServerStatisticName().replace("_","/"))){
                         String value = statisticDataObject.getValue();
                         bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
                     }
@@ -112,9 +115,9 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream)); // Not closing due to NullPonterException in gzipCompressorInputStream
             String line;
             while ((line = reader.readLine()) != null) {
-                    statValues.add(line);
-                }
-            } catch (IOException e) {
+                statValues.add(line);
+            }
+        } catch (IOException e) {
             logger.error("IOException while reading inputStream from stats logs", e);
         }
         return statValues;
@@ -199,7 +202,8 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //        getSessManRegisteredAccounts(inputList);
 //        getSessManConnections(inputList);
 //        getSessManSessions(inputList);
-        getSessManProcessor(inputList);
+//        getSessManProcessor(inputList);
+        getQueues(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -290,6 +294,17 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             Matcher m = r.matcher(line);
             if(m.find()){
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("value"));
+            }
+        }
+    }
+
+    private void getQueues(List<String> inputList){
+        String pattern = SERVICE + "/(?<parameter>((IN|OUT)_QUEUE ((IQ [A-Za-z0-9/._#:-]+)|IQ|other|cluster|presences|messages|IQ no XMLNS)))\\s+(?<value>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("parameter"), m.group("value"));
             }
         }
     }
