@@ -198,12 +198,11 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     protected void getStatisticsFromList(List<String> inputList){
 //        getLastHourPackets(inputList);
 //        getCPUandMemory(inputList);
-//        getTotalOverflows(inputList);
+        getTotalOverflows(inputList);
 //        getSessManRegisteredAccounts(inputList);
 //        getSessManConnections(inputList);
 //        getSessManSessions(inputList);
 //        getSessManProcessor(inputList);
-        getQueues(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -234,7 +233,11 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.matches()){
+                String serviceComponentOverflowValue = m.group("packets");
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("overflowType") + " overflow" , m.group("packets"));
+                if(Long.parseLong(serviceComponentOverflowValue) > 0){
+                    getServiceComponentQueues(inputList, m.group(SERVICE_NAME_STRING));
+                }
             }
         }
     }
@@ -305,6 +308,17 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             Matcher m = r.matcher(line);
             if(m.find()){
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("parameter"), m.group("value"));
+            }
+        }
+    }
+
+    private void getServiceComponentQueues(List<String> inputList, String serviceComponentName){
+        String pattern = "(?<serviceComponentName>" + serviceComponentName +")" + "/(?<parameter>((IN|OUT)_QUEUE ((IQ [A-Za-z0-9/._#:-]+)|IQ|other|cluster|presences|messages|IQ no XMLNS)))\\s+(?<value>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group("serviceComponentName") + "/" + m.group("parameter"), m.group("value"));
             }
         }
     }
