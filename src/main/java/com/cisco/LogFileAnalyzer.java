@@ -60,7 +60,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         return new TreeMap<>(inputMap); //Added the resulting map to treemap
     }
 
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, boolean isLastFile){
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
         try (FileWriter writer = new FileWriter(filename + ".txt");
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {

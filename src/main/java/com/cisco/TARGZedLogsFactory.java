@@ -30,13 +30,11 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
              TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream)) {
 //            checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath);
             int fileCount = 0;
-            boolean isLastFile;
             TarArchiveEntry currentEntry;
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
                 if(!currentEntry.isDirectory()){
-                    isLastFile = checkForLastFile(tarArchiveInputStream);
                     String logFileName = getListOfFiles(currentEntry); //Refactored
-                    analyzeLogFile(tarArchiveInputStream, fileCount, logFileName,listOfFiles, isLastFile);
+                    analyzeLogFile(tarArchiveInputStream, fileCount, logFileName,listOfFiles);
                     fileCount++;
                 }
             }
@@ -59,9 +57,5 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
 //           open(inputFilePath + "\\" + fileName);
 //        }
 //    }
-
-    private boolean checkForLastFile(TarArchiveInputStream tarArchiveInputStream) throws IOException {
-        return (tarArchiveInputStream.getNextTarEntry()) == null;
-    }
 
 }

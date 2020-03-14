@@ -1,8 +1,6 @@
 package com.cisco;
 
 
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,8 +17,6 @@ public class ZIPedLogsFactory extends ArchiveFactory implements Openable {
 
     protected Enumeration<? extends ZipEntry> entries;
 
-    protected boolean isLastFile = false;
-
     public ZIPedLogsFactory(String inputArchivePath) {
         open(inputArchivePath);
     }
@@ -30,7 +26,6 @@ public class ZIPedLogsFactory extends ArchiveFactory implements Openable {
         try (ZipFile zipFile = new ZipFile(inputArchiveFilePath)){
             int fileCount = 0;
             entries = zipFile.entries();
-            boolean isLastFile;
             while(entries.hasMoreElements()){
                 ZipEntry entry = entries.nextElement();
                 if(!entry.isDirectory()){
@@ -38,8 +33,7 @@ public class ZIPedLogsFactory extends ArchiveFactory implements Openable {
                     ZipEntry zipEntry = zipFile.getEntry(logFileName);
                     listOfFiles.add(logFileName);
                     inputStream = zipFile.getInputStream(zipEntry);
-                    isLastFile = checkForLastFile(entries);
-                    analyzeLogFile(inputStream,fileCount,logFileName, listOfFiles, isLastFile);
+                    analyzeLogFile(inputStream,fileCount,logFileName, listOfFiles);
                     fileCount++;
                 }
             }
@@ -47,9 +41,4 @@ public class ZIPedLogsFactory extends ArchiveFactory implements Openable {
             LogFileAnalyzer.logger.error("IOException while opening ZIP archive.",e);
         }
     }
-
-    private boolean checkForLastFile(Enumeration<? extends ZipEntry> entries) throws IOException {
-        return !entries.hasMoreElements();
-    }
-
 }
