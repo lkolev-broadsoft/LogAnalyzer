@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface OutputFileWriter {
 
-    void writeToOutputTxtFile(String filename, Map<String, Object> inputMap);
+    void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, boolean isLastFile);
 
 }

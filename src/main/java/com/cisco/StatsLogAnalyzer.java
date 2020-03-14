@@ -82,19 +82,21 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     //Don't write for every file, but once for the archive or the folder
     //Need to check if it is the last entry(file and then write, before that store the data in StatisticDataArrayList
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, boolean isLastFile){
         for(String serverStatisticName : serverStatisticsNames){
-            try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
-                 BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-                for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                    StatisticData statisticDataObject = (StatisticData) entry.getValue();
-                    if(serverStatisticName.replace("_","/").matches(statisticDataObject.getServerStatisticName().replace("_","/"))){
-                        String value = statisticDataObject.getValue();
-                        bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
+            if(isLastFile){
+                try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
+                     BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                    for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                        StatisticData statisticDataObject = (StatisticData) entry.getValue();
+                        if(serverStatisticName.replace("_","/").matches(statisticDataObject.getServerStatisticName().replace("_","/"))){
+                            String value = statisticDataObject.getValue();
+                            bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
+                        }
                     }
+                } catch (IOException e) {
+                    logger.error("IOException while writing to Output text file.", e);
                 }
-            } catch (IOException e) {
-                logger.error("IOException while writing to Output text file.", e);
             }
         }
     }
@@ -198,9 +200,9 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
     protected void getStatisticsFromList(List<String> inputList){
 //        getLastHourPackets(inputList);
 //        getCPUandMemory(inputList);
-        getTotalOverflows(inputList);
+       getTotalOverflows(inputList);
 //        getSessManRegisteredAccounts(inputList);
-//        getSessManConnections(inputList);
+        getSessManConnections(inputList);
 //        getSessManSessions(inputList);
 //        getSessManProcessor(inputList);
     }
