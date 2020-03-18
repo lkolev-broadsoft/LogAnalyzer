@@ -65,7 +65,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     protected static final String SESSMAN_PROCESSOR_REGEX = "(/Processor): (?<parameter>[A-Za-z0-9/._:-]+)\\s+, (?<value>(?<queue>Queue:) (?<queueValue>\\d+), (?<averageTime>AvTime: )(?<averageTimeValue>\\d+), (?<runs>Runs: )(?<runsValue>\\d+), (?<lost>Lost: )(?<lostValue>\\d+))";
 
-    protected SortedMap<String, String> statValuesMap = new TreeMap<>();
+    //protected SortedMap<String, String> statValuesMap = new TreeMap<>();
 
     protected static Map<String, String> statisticsMap = new HashMap<>();
 
@@ -82,21 +82,19 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     //Don't write for every file, but once for the archive or the folder
     //Need to check if it is the last entry(file and then write, before that store the data in StatisticDataArrayList
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap, boolean isLastFile){
+    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
         for(String serverStatisticName : serverStatisticsNames){
-            if(isLastFile){
-                try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
-                     BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-                    for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
-                        StatisticData statisticDataObject = (StatisticData) entry.getValue();
-                        if(serverStatisticName.replace("_","/").matches(statisticDataObject.getServerStatisticName().replace("_","/"))){
-                            String value = statisticDataObject.getValue();
-                            bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
-                        }
+            try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
+                 BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
+                    StatisticData statisticDataObject = (StatisticData) entry.getValue();
+                    if(serverStatisticName.replace("_","/").matches(statisticDataObject.getServerStatisticName().replace("_","/"))){
+                        String value = statisticDataObject.getValue();
+                        bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
                     }
-                } catch (IOException e) {
-                    logger.error("IOException while writing to Output text file.", e);
                 }
+            } catch (IOException e) {
+                logger.error("IOException while writing to Output text file.", e);
             }
         }
     }
@@ -186,25 +184,25 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //        }
 //    }
 
-    protected void getCPUusage(List<String> inputList){
-        String pattern = SERVICE + "/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage) (.*)";
-        Pattern r = Pattern.compile(pattern);
-        for(String line : inputList){
-            Matcher m = r.matcher(line);
-            if(m.find()){
-                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("usageType"), m.group(4));
-            }
-        }
-    }
+//    protected void getCPUusage(List<String> inputList){
+//        String pattern = SERVICE + "/(?<usageType>(\\bCPU\\b|\\bHEAP\\b|\\bNONHEAP\\b) usage) (.*)";
+//        Pattern r = Pattern.compile(pattern);
+//        for(String line : inputList){
+//            Matcher m = r.matcher(line);
+//            if(m.find()){
+//                statValuesMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("usageType"), m.group(4));
+//            }
+//        }
+//    }
 
     protected void getStatisticsFromList(List<String> inputList){
-//        getLastHourPackets(inputList);
-//        getCPUandMemory(inputList);
-       getTotalOverflows(inputList);
-//        getSessManRegisteredAccounts(inputList);
+        getLastHourPackets(inputList);
+        getCPUandMemory(inputList);
+        getTotalOverflows(inputList);
+        getSessManRegisteredAccounts(inputList);
         getSessManConnections(inputList);
-//        getSessManSessions(inputList);
-//        getSessManProcessor(inputList);
+        getSessManSessions(inputList);
+        getHighSessManProcessor(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -292,14 +290,27 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
-    private void getSessManProcessor(List<String> inputList){
+//    private void getSessManProcessor(List<String> inputList){
+//        String pattern = SERVICE + SESSMAN_PROCESSOR_REGEX;
+//        Pattern r = Pattern.compile(pattern);
+//        for(String line : inputList){
+//            Matcher m = r.matcher(line);
+//            if(m.find()){
+//                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("value"));
+//            }
+//        }
+//    }
+
+    private void getHighSessManProcessor(List<String> inputList){
         String pattern = SERVICE + SESSMAN_PROCESSOR_REGEX;
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("value"));
-            }
+                if(Long.parseLong(m.group("lostValue")) > 0 || Long.parseLong(m.group("queueValue")) > 0){
+                    statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/Processor: " + m.group("parameter"), m.group("value"));
+                }
+             }
         }
     }
 
