@@ -28,7 +28,7 @@ public class DirectoryFactory extends ArchiveFactory implements Openable {
                 String logFileName = String.valueOf(path.getFileName());
                 listOfFiles.add(logFileName);
                 fileInputStream = new FileInputStream(path.toFile());
-                analyzeLogFile(fileInputStream ,filecount, logFileName, listOfFiles);
+                analyzeLogFile(fileInputStream ,filecount, logFileName, inputArchiveFilePath, listOfFiles);
                 filecount++;
             }
         } catch (IOException e) {

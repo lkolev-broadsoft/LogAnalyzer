@@ -23,7 +23,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     protected static final String LOG_TYPE_REGEX = "(\\w+)"; //Change it later to match only the log types
 
-    protected SortedMap<String, Long> logsPerSecond = new TreeMap<>();
+    protected static SortedMap<String, Long> logsPerSecond = new TreeMap<>();
 
     protected List<String> secondsMissingInLog = new ArrayList<>();
 
@@ -60,8 +60,16 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         return new TreeMap<>(inputMap); //Added the resulting map to treemap
     }
 
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
-        try (FileWriter writer = new FileWriter(filename + ".txt");
+//    protected void addSecondsToLogPerSecondsMap(List<String> timeFrame){
+//        logsPerSecond.appendtimeFrame.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+//    }
+
+
+    public void writeToOutputTxtFile(String filename, String inputArchiveFilePath, Map<String, Object> inputMap){
+        File dir = new File(OutputFileWriter.getFolderPath(inputArchiveFilePath) + File.separator + "Results");
+        dir.mkdirs();
+        File file = new File(dir, filename);
+        try (FileWriter writer = new FileWriter(file);
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                 bw.write((entry.getKey() + " - " + entry.getValue() + "\n"));
@@ -114,6 +122,10 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
             }
         }
         return sortedMap;
+    }
+
+    protected void addResultsFromFileToMap(List<String> timeFrame){
+
     }
 
     protected List<String> getFileNames(List<String> listOfEntries) {

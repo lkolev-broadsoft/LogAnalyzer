@@ -33,7 +33,7 @@ public class ZIPedLogsFactory extends ArchiveFactory implements Openable {
                     ZipEntry zipEntry = zipFile.getEntry(logFileName);
                     listOfFiles.add(logFileName);
                     inputStream = zipFile.getInputStream(zipEntry);
-                    analyzeLogFile(inputStream,fileCount,logFileName, listOfFiles);
+                    analyzeLogFile(inputStream,fileCount,logFileName, inputArchiveFilePath, listOfFiles);
                     fileCount++;
                 }
             }

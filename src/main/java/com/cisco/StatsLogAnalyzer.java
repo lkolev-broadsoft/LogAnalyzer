@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWriter{
+public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWriter{
 
     protected static final String MESSAGE_ROUTER = "message-router";
 
@@ -82,13 +82,16 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 
     //Don't write for every file, but once for the archive or the folder
     //Need to check if it is the last entry(file and then write, before that store the data in StatisticDataArrayList
-    public void writeToOutputTxtFile(String filename, Map<String, Object> inputMap){
+    public void writeToOutputTxtFile(String filename, String inputArchiveFilePath, Map<String, Object> inputMap){
+        File dir = new File(OutputFileWriter.getFolderPath(inputArchiveFilePath) + File.separator + "Results");
+        dir.mkdirs();
         for(String serverStatisticName : serverStatisticsNames){
-            try (FileWriter writer = new FileWriter( serverStatisticName.replace("/","_") + ".txt");
+            File file = new File(dir, serverStatisticName.replace("/","_") + ".txt");
+            try (FileWriter writer = new FileWriter(file);
                  BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
                 for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
                     StatisticData statisticDataObject = (StatisticData) entry.getValue();
-                    if(serverStatisticName.replace("_","/").matches(statisticDataObject.getServerStatisticName().replace("_","/"))){
+                    if(serverStatisticName.replace("_","/").contains(statisticDataObject.getServerStatisticName().replace("_","/"))){
                         String value = statisticDataObject.getValue();
                         bufferedWriter.write((entry.getKey() + "  " + value + "\n"));
                     }
@@ -98,6 +101,7 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
             }
         }
     }
+
 
     //Adding Statistic name to Map's key in order to differentiate
     protected SortedMap<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){
@@ -196,6 +200,8 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
 //    }
 
     protected void getStatisticsFromList(List<String> inputList){
+//        getLastSecondPackets(inputList);
+        getLastSecondMinutePackets(inputList);
         getLastHourPackets(inputList);
         getCPUandMemory(inputList);
         getTotalOverflows(inputList);
@@ -227,6 +233,16 @@ public class StatsLogAnalyzer  extends  LogFileAnalyzer implements OutputFileWri
         }
     }
 
+    private void getLastSecondMinutePackets(List<String> inputList) {
+        String pattern = SERVICE + "/(?<lastPackets>Last (?<timeRange>\\bsecond\\b|\\bminute\\b) packets)\\s+(?<packets>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("lastPackets") , m.group("packets"));
+            }
+        }
+    }
     private void getServiceComponentsTotalOverflows(List<String> inputList){
         String pattern = SERVICE + "/((?<overflowType>\\bTotal queues\\b) overflow)\\s+(?<packets>\\d+)";
         Pattern r = Pattern.compile(pattern);

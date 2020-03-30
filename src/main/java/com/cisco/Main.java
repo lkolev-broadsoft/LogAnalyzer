@@ -7,7 +7,6 @@ public class Main {
     public static void main(String[] args) {
         BasicConfigurator.configure();
         LogAnalyzer logA = new LogAnalyzer(args[0]);
-
     }
 
 }

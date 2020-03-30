@@ -34,7 +34,7 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
                 if(!currentEntry.isDirectory()){
                     String logFileName = getListOfFiles(currentEntry); //Refactored
-                    analyzeLogFile(tarArchiveInputStream, fileCount, logFileName,listOfFiles);
+                    analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, inputArchiveFilePath, listOfFiles);
                     fileCount++;
                 }
             }
