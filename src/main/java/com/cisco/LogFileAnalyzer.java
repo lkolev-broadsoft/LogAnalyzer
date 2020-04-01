@@ -1,5 +1,7 @@
 package com.cisco;
 
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +130,10 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     }
 
+
+    //Might not need to get the fileNames as there would be only one file per start.
+    //Maybe two if there are IMP and Presence logs logtype +.txt
+    //Use logType +.txt instead.
     protected List<String> getFileNames(List<String> listOfEntries) {
         List<String> filenames = new ArrayList<>();
         String pattern = logType + "(\\d{4}\\.\\d{2}\\.\\d{2})-(\\d{2}\\.\\d{2}\\.\\d{2})(.txt)";
@@ -141,9 +147,15 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
         return filenames;
     }
 
+    protected void addFileResultsMapToLogsPerSecond(SortedMap<String, Long> fileResultsMap){
+        fileResultsMap.forEach(
+                (key, value) -> logsPerSecond.merge( key, value,  (v1, v2) -> v1 + v2));
+    }
+
     protected Map analyzeLog(InputStream inputStream, String logFileName){
         seconds = getTimeFrameList(inputStream);
-        logsPerSecond = countSeconds(seconds);
+        //logsPerSecond = countSeconds(seconds);
+        addFileResultsMapToLogsPerSecond(countSeconds(seconds));
         secondsMissingInLog = findPauses(getTimeFrame(logsPerSecond),logsPerSecond);
         return addPausesToMap(secondsMissingInLog, logsPerSecond);
     }
