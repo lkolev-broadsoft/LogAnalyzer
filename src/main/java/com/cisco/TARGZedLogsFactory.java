@@ -9,10 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
 
     protected List<String> listOfFiles = new ArrayList<>();
+
+    protected Map<String, Object> results;
 
     public TARGZedLogsFactory(String inputArchivePath) {
         open(inputArchivePath);
@@ -34,13 +37,13 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
             while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
                 if(!currentEntry.isDirectory()){
                     String logFileName = getListOfFiles(currentEntry); //Refactored
-                    analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, inputArchiveFilePath, listOfFiles);
+                    results = analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, inputArchiveFilePath, listOfFiles);
                     fileCount++;
                 }
             }
+            logFileAnalyzer.writeToOutputTxtFile((logFileAnalyzer.logType), inputArchiveFilePath, results);
         } catch (IOException e) {
             LogFileAnalyzer.logger.error("IOException while opening TAR archive.",e);
-
             //Every class should have separate logger.
         }
     }

@@ -409,9 +409,9 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
         List<String> statsList = getStatsValues(inputStream);
         getStatisticsFromList(statsList);
         createStatisticDataObjectList(statisticsMap, extractLocalDateTimeFromFilename(logFileName));
-        SortedMap<String,Object > testmap = createResultsMapFromStatisticDataObject(statisticDataArrayList);
+        SortedMap<String,Object > resultMap = createResultsMapFromStatisticDataObject(statisticDataArrayList);
         getServerStatisticsNames(statisticDataArrayList);
-        return testmap;
+        return resultMap;
     }
 
     private void getServerStatisticsNames(List<StatisticData> statisticDataObjectsList){

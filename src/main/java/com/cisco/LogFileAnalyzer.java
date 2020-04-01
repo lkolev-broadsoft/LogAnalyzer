@@ -27,6 +27,8 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     protected static SortedMap<String, Long> logsPerSecond = new TreeMap<>();
 
+    protected static SortedMap<String, Long> resultsMap = new TreeMap<>();
+
     protected List<String> secondsMissingInLog = new ArrayList<>();
 
     protected List<String> seconds = new ArrayList<>();
@@ -70,7 +72,7 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
     public void writeToOutputTxtFile(String filename, String inputArchiveFilePath, Map<String, Object> inputMap){
         File dir = new File(OutputFileWriter.getFolderPath(inputArchiveFilePath) + File.separator + "Results");
         dir.mkdirs();
-        File file = new File(dir, filename);
+        File file = new File(dir, filename + "LogsPerSecond" + ".txt");
         try (FileWriter writer = new FileWriter(file);
              BufferedWriter bw = new BufferedWriter(writer)) {
             for(Map.Entry<String, Object> entry : inputMap.entrySet()) {
@@ -152,12 +154,21 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
                 (key, value) -> logsPerSecond.merge( key, value,  (v1, v2) -> v1 + v2));
     }
 
+//    protected Map analyzeLog(InputStream inputStream, String logFileName){
+//        seconds = getTimeFrameList(inputStream);
+//        //logsPerSecond = countSeconds(seconds);
+//        addFileResultsMapToLogsPerSecond(countSeconds(seconds));
+//        secondsMissingInLog = findPauses(getTimeFrame(logsPerSecond),logsPerSecond);
+//        return addPausesToMap(secondsMissingInLog, logsPerSecond);
+//    }
+
     protected Map analyzeLog(InputStream inputStream, String logFileName){
         seconds = getTimeFrameList(inputStream);
         //logsPerSecond = countSeconds(seconds);
         addFileResultsMapToLogsPerSecond(countSeconds(seconds));
         secondsMissingInLog = findPauses(getTimeFrame(logsPerSecond),logsPerSecond);
-        return addPausesToMap(secondsMissingInLog, logsPerSecond);
+        resultsMap = addPausesToMap(secondsMissingInLog, logsPerSecond);
+        return resultsMap;
     }
 
 }
