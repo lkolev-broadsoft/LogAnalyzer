@@ -61,7 +61,7 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
 
     protected static final String STATS_DATE_REGEX = "(?<year>20\\d\\d)-(?<month>0[1-9]|1[012])-(?<day>0[1-9]|[12][0-9]|3[01])";
 
-    protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])[:|_|/](?<minute>[0-5][0-9])[:|_|/](?<second>[0-5][0-9])";
+    protected static final String STATS_TIME_REGEX = "(?<hour>0[0-9]|1[0-9]|2[0-3])([:|_|/]|(%3A))(?<minute>[0-5][0-9])([:|_|/]|(%3A))(?<second>[0-5][0-9])";
 
     protected static final String SESSMAN_PROCESSOR_REGEX = "(/Processor): (?<parameter>[A-Za-z0-9/._:-]+)\\s+, (?<value>(?<queue>Queue:) (?<queueValue>\\d+), (?<averageTime>AvTime: )(?<averageTimeValue>\\d+), (?<runs>Runs: )(?<runsValue>\\d+), (?<lost>Lost: )(?<lostValue>\\d+))";
 
@@ -79,9 +79,6 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
         this.logType = "stats";
     }
 
-
-    //Don't write for every file, but once for the archive or the folder
-    //Need to check if it is the last entry(file and then write, before that store the data in StatisticDataArrayList
     public void writeToOutputTxtFile(String filename, String inputArchiveFilePath, Map<String, Object> inputMap){
         File dir = new File(OutputFileWriter.getFolderPath(inputArchiveFilePath) + File.separator + "Results");
         dir.mkdirs();
@@ -101,7 +98,6 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
             }
         }
     }
-
 
     //Adding Statistic name to Map's key in order to differentiate
     protected SortedMap<String, Object> createResultsMapFromStatisticDataObject(List<StatisticData> statisticDataList){

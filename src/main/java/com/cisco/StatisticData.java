@@ -7,7 +7,7 @@ public class StatisticData {
     protected LocalDateTime time;
     protected String serverStatisticName;
     protected String value;
-    protected Long normalValue;
+    protected String normalValue;
 
     public StatisticData(LocalDateTime time, String serverStatistic, Long value, Long normalValue){
     }
@@ -42,7 +42,7 @@ public class StatisticData {
         return value;
     }
 
-    public Long getNormalValue() {
+    public String getNormalValue() {
         return normalValue;
     }
 
@@ -58,7 +58,7 @@ public class StatisticData {
         this.value = value;
     }
 
-    public void setNormalValue(Long normalValue) {
+    public void setNormalValue(String normalValue) {
         this.normalValue = normalValue;
     }
 

@@ -27,6 +27,7 @@ public interface Openable {
                 return new TARGZedLogsFactory(inputArchiveFilePath);
             }
             else {
+                System.out.println("Unsupported input type, only zip and tar.gz  or directories files are accepted.");
                 LogFileAnalyzer.logger.error("Unsupported input type, only zip and tar.gz  or directories files are accepted.");
             }
         }

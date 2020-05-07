@@ -6,6 +6,7 @@ import java.util.Map;
 
 public abstract class ArchiveFactory {
 
+    protected static final String ARCHIVE_EXTENSION_ENDING = "((\\.zip)|(\\.tar\\.gz))";
     protected OldLogFileAnalyzerFactory logFileFactory = new OldLogFileAnalyzerFactory();
     protected LogFileAnalyzer logFileAnalyzer;
 
@@ -16,6 +17,5 @@ public abstract class ArchiveFactory {
 //        logFileAnalyzer.writeToOutputTxtFile((logFileAnalyzer.logType), archiveFilePath, results);
         //Return logFileAnalyer, in order to call write method on it.
         return results;
-        //Add logic in StatsLogAnalyzer, analyzeLog method to check if it is the last file in the archive or in the directory and write the accumulated statistics to file.
     }
 }
