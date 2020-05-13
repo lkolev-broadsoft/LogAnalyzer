@@ -34,22 +34,27 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
         try (FileInputStream fileInputStream = new FileInputStream(inputArchiveFilePath);
              GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(fileInputStream);
              TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream)) {
-            int fileCount = 0;
-            TarArchiveEntry currentEntry;
-           // checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath, currentEntry);
-            while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
-//                checkForNestedArchives(inputArchiveFilePath,currentEntry);
-                if(!currentEntry.isDirectory()){
-                    String logFileName = getListOfFiles(currentEntry); //Refactored
-                    results = analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, inputArchiveFilePath, listOfFiles);
-                    fileCount++;
-                }
-            }
-            logFileAnalyzer.writeToOutputTxtFile((logFileAnalyzer.logType), inputArchiveFilePath, results);
+            analyzeArchive(inputArchiveFilePath, tarArchiveInputStream);
+            //logFileAnalyzer.writeToOutputTxtFile((logFileAnalyzer.logType), inputArchiveFilePath, results);
         } catch (IOException e) {
             LogFileAnalyzer.logger.error("IOException while opening TAR archive.",e);
             //Every class should have separate logger.
         }
+    }
+
+    private void analyzeArchive(String inputArchiveFilePath, TarArchiveInputStream tarArchiveInputStream) throws IOException {
+        int fileCount = 0;
+        TarArchiveEntry currentEntry;
+//            checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath, currentEntry);
+        while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
+                checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath);
+            if(!currentEntry.isDirectory()){
+                String logFileName = getListOfFiles(currentEntry); //Refactored
+                results = analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, inputArchiveFilePath, listOfFiles);
+                fileCount++;
+            }
+        }
+        logFileAnalyzer.writeToOutputTxtFile((logFileAnalyzer.logType), inputArchiveFilePath, results);
     }
 
     private String getListOfFiles(TarArchiveEntry currentEntry) {
@@ -58,12 +63,15 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
         return logFileName;
     }
 
-//    private void checkForNestedArchives(TarArchiveInputStream inputStream, String inputFilePath) throws IOException {
-//        String fileName = inputStream.getNextEntry().getName();
-//        if(fileName.contains(".tar.gz")){
+    private void checkForNestedArchives(TarArchiveInputStream inputStream, String inputFilePath) throws IOException {
+        String fileName = inputStream.getNextEntry().getName();
+        if(fileName.contains(".tar.gz")){
 //           open(inputFilePath + File.separator + fileName);
-//        }
-//    }
+            TarArchiveInputStream nestedTarAcrhiveInputStream = new TarArchiveInputStream(inputStream);
+            String newInputFilePath = inputFilePath.replace(".tar.gz","") + fileName;
+            analyzeArchive( newInputFilePath ,nestedTarAcrhiveInputStream);
+        }
+    }
 
 //    private void checkForNestedArchives(String inputFilePath, TarArchiveEntry currentEntry) throws IOException {
 //        if (currentEntry.getName().toUpperCase().matches(ARCHIVE_EXTENSION_ENDING.toUpperCase())) {

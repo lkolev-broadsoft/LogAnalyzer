@@ -57,7 +57,9 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
 
     protected static final String SESS_MAN = "sess-man";
 
-    protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b|\\bbosh\\b|\\bcl-comp\\b|\\bext\\b)";
+    protected static final String MUC = "muc";
+
+    protected static final String SERVICE = "(?<serviceName>\\bmessage-router\\b|\\bc2s\\b|\\bs2s\\b|\\bsess-man\\b|\\bbosh\\b|\\bcl-comp\\b|\\bext\\b|\\bmuc\\b)";
 
     protected static final String STATS_DATE_REGEX = "(?<year>20\\d\\d)-(?<month>0[1-9]|1[012])-(?<day>0[1-9]|[12][0-9]|3[01])";
 
@@ -205,6 +207,9 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
         getSessManConnections(inputList);
         getSessManSessions(inputList);
         getHighSessManProcessor(inputList);
+        getMUCQueues(inputList);
+        getMUCAverageProcessingTime(inputList);
+        getMUCProcessedPackets(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -302,6 +307,8 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
         }
     }
 
+
+
 //    private void getSessManProcessor(List<String> inputList){
 //        String pattern = SERVICE + SESSMAN_PROCESSOR_REGEX;
 //        Pattern r = Pattern.compile(pattern);
@@ -333,6 +340,39 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
             Matcher m = r.matcher(line);
             if(m.find()){
                 statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("parameter"), m.group("value"));
+            }
+        }
+    }
+
+    private void getMUCQueues(List<String> inputList){
+        String pattern = "(?<muc>muc)" + "/(?<parameter>((IN|OUT)_QUEUE ((IQ [A-Za-z0-9/._#:-]+)|IQ|other|cluster|presences|messages|IQ no XMLNS)))\\s+(?<value>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group("muc") + "/" + m.group("parameter"), m.group("value"));
+            }
+        }
+    }
+
+    private void getMUCAverageProcessingTime(List<String> inputList){
+        String pattern = "(?<muc>muc)" + "/(?<parameter>(Average processing time on last 100 runs \\[ms\\]))\\s+(?<value>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group("muc") + "/" + m.group("parameter"), m.group("value"));
+            }
+        }
+    }
+
+    private void getMUCProcessedPackets(List<String> inputList){
+        String pattern = "(?<muc>muc)" + "/(?<parameter>(Processed packets (out|in)_0-muc))\\s+(?<value>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group("muc") + "/" + m.group("parameter"), m.group("value"));
             }
         }
     }
