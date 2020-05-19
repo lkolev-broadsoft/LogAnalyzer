@@ -210,6 +210,7 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
         getMUCQueues(inputList);
         getMUCAverageProcessingTime(inputList);
         getMUCProcessedPackets(inputList);
+        getComponentTotalQueuesWait(inputList);
     }
 
     private void getCPUandMemory(List<String> inputList) {
@@ -335,6 +336,17 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
 
     private void getQueues(List<String> inputList){
         String pattern = SERVICE + "/(?<parameter>((IN|OUT)_QUEUE ((IQ [A-Za-z0-9/._#:-]+)|IQ|other|cluster|presences|messages|IQ no XMLNS)))\\s+(?<value>\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        for(String line : inputList){
+            Matcher m = r.matcher(line);
+            if(m.find()){
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group("parameter"), m.group("value"));
+            }
+        }
+    }
+
+    private void getComponentTotalQueuesWait(List<String> inputList){
+        String pattern = SERVICE + "/(?<parameter>(Total( In| Out|) queues wait))\\s+(?<value>\\d+)";
         Pattern r = Pattern.compile(pattern);
         for(String line : inputList){
             Matcher m = r.matcher(line);

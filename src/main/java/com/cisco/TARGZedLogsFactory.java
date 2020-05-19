@@ -47,7 +47,7 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
         TarArchiveEntry currentEntry;
 //            checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath, currentEntry);
         while (((currentEntry = tarArchiveInputStream.getNextTarEntry()) != null)) {
-                checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath);
+                //checkForNestedArchives(tarArchiveInputStream, inputArchiveFilePath);
             if(!currentEntry.isDirectory()){
                 String logFileName = getListOfFiles(currentEntry); //Refactored
                 results = analyzeLogFile(tarArchiveInputStream, fileCount, logFileName, inputArchiveFilePath, listOfFiles);
@@ -68,7 +68,7 @@ public class TARGZedLogsFactory extends ArchiveFactory implements Openable {
         if(fileName.contains(".tar.gz")){
 //           open(inputFilePath + File.separator + fileName);
             TarArchiveInputStream nestedTarAcrhiveInputStream = new TarArchiveInputStream(inputStream);
-            String newInputFilePath = inputFilePath.replace(".tar.gz","") + fileName;
+            String newInputFilePath = inputFilePath.replace(".tar.gz","") + File.separator + fileName;
             analyzeArchive( newInputFilePath ,nestedTarAcrhiveInputStream);
         }
     }
