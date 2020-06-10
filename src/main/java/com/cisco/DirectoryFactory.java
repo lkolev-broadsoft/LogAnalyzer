@@ -19,7 +19,11 @@ public class DirectoryFactory extends ArchiveFactory implements Openable {
     protected Map<String, Object> results;
 
     public DirectoryFactory(String inputPath) {
-        open(inputPath);
+        //Check if there are archives in the provided directory and use recursion to call analyser
+        //Problem that it goes in the Results directories.
+        //Maybe write a check to exclude results folder
+        checkForArchivesInDirectory(inputPath);
+        //open(inputPath);
     }
 
     @Override
@@ -37,6 +41,25 @@ public class DirectoryFactory extends ArchiveFactory implements Openable {
             logFileAnalyzer.writeToOutputTxtFile((logFileAnalyzer.logType), inputArchiveFilePath, results);
         } catch (IOException e) {
             LogFileAnalyzer.logger.error("IOException while opening directory.",e);
+        }
+    }
+
+    protected void checkForArchivesInDirectory(String inputPath) {
+        Path directoryPath = Paths.get(inputPath);
+        try(DirectoryStream<Path> direcotryPathStream = Files.newDirectoryStream(directoryPath, "*.{tar.gz,zip,log,txt}")) {
+            for(Path path : direcotryPathStream){
+                if((!Files.isDirectory(path)) && (!(path.getFileName().toString().contains("Results"))) && (!Openable.isArchive(path.toString()))){
+                    open(inputPath);
+                }
+                else if(Openable.isArchive(path.toString())){
+                    Openable.determineArchiveType(path.toString());
+                }
+//                else {
+//                    Openable.determineArchiveType(path.toString());
+//                }
+            }
+        } catch (IOException e) {
+            LogFileAnalyzer.logger.error("IOException while checking directory for archives.",e);
         }
     }
 }

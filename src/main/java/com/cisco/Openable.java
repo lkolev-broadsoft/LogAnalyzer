@@ -37,6 +37,23 @@ public interface Openable {
         return null;
     }
 
-
+    static boolean isArchive(String inputPath){
+        boolean isArchive = false;
+        String pattern = "(\\.zip)|(\\.tar\\.gz)";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(inputPath);
+        if(m.find()){
+            if(m.group().equals(m.group(1))){
+                isArchive = true;
+            }
+            else if(m.group().equals(m.group(2))){
+                isArchive = true;
+            }
+            else {
+                LogFileAnalyzer.logger.error("Unsupported input type, only zip and tar.gz  or directories files are accepted.");
+            }
+        }
+        return isArchive;
+    }
 
 }
