@@ -25,6 +25,8 @@ public abstract class LogFileAnalyzer  implements OutputFileWriter{
 
     protected static final String LOG_TYPE_REGEX = "(\\w+)"; //Change it later to match only the log types
 
+    //(\bIMP\b|\bProvisioningAdapter\b|\bGateway\b|\bDBconnector\b|\bMUC\b)
+
     protected static SortedMap<String, Long> logsPerSecond = new TreeMap<>();
 
     protected static SortedMap<String, Long> resultsMap = new TreeMap<>();
