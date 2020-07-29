@@ -281,7 +281,7 @@ public class StatsLogAnalyzer extends LogFileAnalyzer implements OutputFileWrite
         for(String line : inputList){
             Matcher m = r.matcher(line);
             if(m.find()){
-                statisticsMap.put(m.group(SERVICE_NAME_STRING) + "/" + m.group(2), m.group("packets"));
+                statisticsMap.put(m.group(SERVICE_NAME_STRING) + m.group(2), m.group("packets"));
             }
         }
     }
